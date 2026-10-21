@@ -5,3 +5,6 @@ psycopg[binary]
 pydantic-settings
 httpx
 python-dotenv
+pgvector
+sentence-transformers
+tiktoken

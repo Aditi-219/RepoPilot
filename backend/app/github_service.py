@@ -2,8 +2,13 @@
 
 This service interacts with the public GitHub REST API to verify repository
 existence and retrieve core details (stars, language, description, IDs).
+
+Phase 2 additions:
+- fetch_repo_tree(): walks the full file tree of a repository
+- fetch_file_content(): downloads and decodes a single file's content
 """
 
+import base64
 import os
 import re
 from typing import Any
@@ -14,6 +19,36 @@ from fastapi import HTTPException
 
 # GitHub REST API v3 base endpoint
 GITHUB_API = "https://api.github.com"
+
+# File extensions RepoPilot will index.
+# Binary files, images, lock files, and build artifacts are excluded.
+SUPPORTED_EXTENSIONS: frozenset[str] = frozenset({
+    ".py", ".js", ".ts", ".jsx", ".tsx",
+    ".java", ".go", ".rb", ".rs", ".cpp",
+    ".c", ".h", ".cs", ".php", ".swift",
+    ".kt", ".md", ".yml", ".yaml", ".toml",
+    ".html", ".css", ".sh", ".bash",
+})
+
+# Skip files larger than this many bytes (100 KB) to avoid indexing
+# generated, minified, or vendor files that add noise.
+MAX_FILE_BYTES: int = 100 * 1024  # 100 KB
+
+
+def _build_headers() -> dict[str, str]:
+    """Build standard GitHub API headers, optionally with an auth token.
+
+    Adding a GITHUB_TOKEN raises the rate limit from 60 req/hr to 5,000 req/hr.
+    """
+    headers: dict[str, str] = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "RepoPilot-Agent",
+    }
+    token = os.getenv("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
 
 
 def parse_github_url(url: str) -> tuple[str, str]:
@@ -115,24 +150,12 @@ async def fetch_repository(url: str) -> dict[str, Any]:
     owner, repo = parse_github_url(url)
     api_url = f"{GITHUB_API}/repos/{owner}/{repo}"
 
-    # Required and recommended GitHub headers
-    headers: dict[str, str] = {
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "RepoPilot-Agent",
-    }
-
-    # Optional: If GITHUB_TOKEN is set in .env, use it to increase rate limit from 60/hr to 5,000/hr
-    github_token = os.getenv("GITHUB_TOKEN")
-    if github_token:
-        headers["Authorization"] = f"Bearer {github_token}"
-
     try:
         # Using async httpx client with follow_redirects=True so GitHub 301/302 redirects
         # (e.g. for renamed repos or organization slug changes) are followed automatically.
         # Timeout set to 25.0s to allow for DNS resolution and TLS handshakes.
         async with httpx.AsyncClient(timeout=25.0, follow_redirects=True) as client:
-            response = await client.get(api_url, headers=headers)
+            response = await client.get(api_url, headers=_build_headers())
 
     except httpx.TimeoutException:
         raise HTTPException(
@@ -181,3 +204,123 @@ async def fetch_repository(url: str) -> dict[str, Any]:
         "stars": data.get("stargazers_count", 0),
         "language": data.get("language"),
     }
+
+
+# -----------------------------------------------------------------------------
+# Phase 2 — File Tree & Content Fetching
+# -----------------------------------------------------------------------------
+
+async def fetch_repo_tree(owner: str, repo: str) -> list[dict[str, Any]]:
+    """Fetch the full recursive file tree of a GitHub repository.
+
+    Uses the Git Trees API with `recursive=1` to get all file paths in a single
+    request instead of walking directory by directory.
+
+    Calls: GET /repos/{owner}/{repo}/git/trees/HEAD?recursive=1
+
+    Args:
+        owner: Repository owner/organization name.
+        repo: Repository name.
+
+    Returns:
+        list[dict]: Filtered list of file entries, each containing:
+                    - 'path' (str): relative file path (e.g. 'src/utils/parser.py')
+                    - 'size' (int): file size in bytes
+                    Only blobs (files) with supported extensions are included.
+
+    Raises:
+        HTTPException: On network errors, rate limits, or missing default branch.
+    """
+    api_url = f"{GITHUB_API}/repos/{owner}/{repo}/git/trees/HEAD?recursive=1"
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+            response = await client.get(api_url, headers=_build_headers())
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="GitHub API timed out fetching file tree.")
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=502, detail=f"Network error fetching file tree: {exc}")
+
+    if response.status_code == 404:
+        raise HTTPException(status_code=404, detail="Repository not found or has no commits.")
+    if response.status_code == 403:
+        raise HTTPException(status_code=503, detail="GitHub rate limit reached. Set GITHUB_TOKEN in .env.")
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail=f"GitHub returned HTTP {response.status_code} for file tree.")
+
+    data = response.json()
+
+    # Filter: only include blob (file) entries with supported extensions
+    # and within the file size limit
+    supported_files: list[dict[str, Any]] = []
+    for item in data.get("tree", []):
+        if item.get("type") != "blob":
+            continue  # skip directories and submodules
+
+        path: str = item.get("path", "")
+        size: int = item.get("size", 0)
+
+        # Check extension
+        ext = "." + path.rsplit(".", 1)[-1].lower() if "." in path else ""
+        if ext not in SUPPORTED_EXTENSIONS:
+            continue
+
+        # Skip files that are too large
+        if size > MAX_FILE_BYTES:
+            continue
+
+        supported_files.append({"path": path, "size": size})
+
+    return supported_files
+
+
+async def fetch_file_content(owner: str, repo: str, path: str) -> str | None:
+    """Download and decode the content of a single file from a GitHub repository.
+
+    Uses the Contents API which returns base64-encoded file content.
+
+    Calls: GET /repos/{owner}/{repo}/contents/{path}
+
+    Args:
+        owner: Repository owner/organization name.
+        repo: Repository name.
+        path: Relative file path within the repository.
+
+    Returns:
+        str | None: Decoded UTF-8 text content of the file, or None if the
+                    file cannot be decoded (e.g., it is actually a binary file).
+
+    Raises:
+        HTTPException: On network errors or rate limits.
+    """
+    api_url = f"{GITHUB_API}/repos/{owner}/{repo}/contents/{path}"
+
+    try:
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+            response = await client.get(api_url, headers=_build_headers())
+    except httpx.TimeoutException:
+        # Non-fatal: skip this file and continue indexing
+        return None
+    except httpx.RequestError:
+        return None
+
+    if response.status_code == 403:
+        raise HTTPException(status_code=503, detail="GitHub rate limit reached. Set GITHUB_TOKEN in .env.")
+
+    if response.status_code != 200:
+        # Non-fatal: some files may have been moved or deleted since tree was fetched
+        return None
+
+    data = response.json()
+
+    # GitHub returns content as base64-encoded string with possible newlines
+    encoded = data.get("content", "")
+    if not encoded:
+        return None
+
+    try:
+        decoded_bytes = base64.b64decode(encoded)
+        return decoded_bytes.decode("utf-8")
+    except (ValueError, UnicodeDecodeError):
+        # Skip binary files that slipped through extension filtering
+        return None

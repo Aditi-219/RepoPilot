@@ -2,25 +2,45 @@
 
 This module initializes the FastAPI app, configures CORS, handles database table
 creation on startup, and exposes REST endpoints for repository management.
+
+Phase 2 additions:
+- POST /api/repositories/{id}/index  — triggers background indexing
+- GET  /api/repositories/{id}/chunks — lists indexed chunks (paginated)
+- GET  /api/repositories/{id}/chunks/count — returns total chunk count
 """
 
+import logging
 import os
 from contextlib import asynccontextmanager
 from typing import Any
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
 from app.github_service import fetch_repository
-from app.models import Repository
-from app.schemas import RepositoryCreate, RepositoryResponse, StatusUpdate
+from app.indexer import index_repository
+from app.models import CodeChunk, Repository
+from app.schemas import (
+    ChunkCountResponse,
+    ChunkResponse,
+    IndexResponse,
+    RepositoryCreate,
+    RepositoryResponse,
+    StatusUpdate,
+)
 
 # Load environment configuration
 load_dotenv()
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 # Determine allowed frontend origins for Cross-Origin Resource Sharing (CORS)
 # Defaults to standard Vite dev server ports (localhost and 127.0.0.1)
@@ -52,7 +72,7 @@ app = FastAPI(
         "Backend API for RepoPilot: AI-powered codebase intelligence, "
         "hybrid retrieval, and bug debugging copilot."
     ),
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -77,7 +97,7 @@ def root() -> dict[str, str]:
     return {
         "message": "Welcome to RepoPilot API",
         "docs": "/docs",
-        "version": "0.1.0",
+        "version": "0.2.0",
     }
 
 
@@ -240,3 +260,141 @@ def update_repository_status(
     db.refresh(repository)
 
     return repository
+
+
+# -----------------------------------------------------------------------------
+# Phase 2 — Indexing Endpoints
+# -----------------------------------------------------------------------------
+
+@app.post(
+    "/api/repositories/{repository_id}/index",
+    response_model=IndexResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+    tags=["Indexing"],
+)
+async def trigger_indexing(
+    repository_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+) -> IndexResponse:
+    """Trigger the ingestion and indexing pipeline for a repository.
+
+    This endpoint returns immediately with 202 Accepted. The actual pipeline
+    (fetching files, chunking, embedding, storing vectors) runs as a
+    FastAPI BackgroundTask in a separate thread so the HTTP response is
+    not blocked.
+
+    The repository status changes:
+      pending/failed → indexing  (immediately, before response)
+      indexing → completed       (after pipeline finishes, in background)
+      indexing → failed          (if pipeline encounters an unrecoverable error)
+
+    Args:
+        repository_id: ID of the repository to index.
+        background_tasks: FastAPI BackgroundTasks injected automatically.
+        db: Injected SQLAlchemy database session.
+
+    Returns:
+        IndexResponse: Confirmation with repository ID and new status.
+    """
+    repository = db.get(Repository, repository_id)
+    if repository is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository with ID {repository_id} not found.",
+        )
+
+    if repository.status == "indexing":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Repository '{repository.full_name}' is already being indexed. Please wait for it to finish.",
+        )
+
+    # Schedule the pipeline as a background task.
+    background_tasks.add_task(index_repository, repository_id)
+
+
+    logger.info("Indexing triggered for repository %d (%s)", repository_id, repository.full_name)
+
+    return IndexResponse(
+        message=f"Indexing started for '{repository.full_name}'. Check status via GET /api/repositories/{repository_id}.",
+        repository_id=repository_id,
+        status="indexing",
+    )
+
+
+@app.get(
+    "/api/repositories/{repository_id}/chunks",
+    response_model=list[ChunkResponse],
+    tags=["Indexing"],
+)
+def list_chunks(
+    repository_id: int,
+    skip: int = Query(default=0, ge=0, description="Number of chunks to skip (for pagination)"),
+    limit: int = Query(default=20, ge=1, le=100, description="Max chunks to return"),
+    db: Session = Depends(get_db),
+) -> list[CodeChunk]:
+    """List indexed code chunks for a repository (paginated).
+
+    Useful for inspecting what was indexed and verifying chunking quality.
+
+    Args:
+        repository_id: Repository whose chunks to list.
+        skip:  Offset for pagination.
+        limit: Page size (1-100).
+        db:    Injected database session.
+
+    Returns:
+        list[ChunkResponse]: Ordered list of chunk records (no embedding vectors).
+    """
+    # Verify the repository exists
+    repository = db.get(Repository, repository_id)
+    if repository is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository with ID {repository_id} not found.",
+        )
+
+    statement = (
+        select(CodeChunk)
+        .where(CodeChunk.repository_id == repository_id)
+        .order_by(CodeChunk.file_path, CodeChunk.start_line)
+        .offset(skip)
+        .limit(limit)
+    )
+    return list(db.scalars(statement).all())
+
+
+@app.get(
+    "/api/repositories/{repository_id}/chunks/count",
+    response_model=ChunkCountResponse,
+    tags=["Indexing"],
+)
+def count_chunks(
+    repository_id: int,
+    db: Session = Depends(get_db),
+) -> ChunkCountResponse:
+    """Return the total number of indexed chunks for a repository.
+
+    Args:
+        repository_id: Repository to count chunks for.
+        db: Injected database session.
+
+    Returns:
+        ChunkCountResponse: Repository ID and total chunk count.
+    """
+    repository = db.get(Repository, repository_id)
+    if repository is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Repository with ID {repository_id} not found.",
+        )
+
+    count = db.scalar(
+        select(func.count()).where(CodeChunk.repository_id == repository_id)
+    )
+
+    return ChunkCountResponse(
+        repository_id=repository_id,
+        chunk_count=count or 0,
+    )

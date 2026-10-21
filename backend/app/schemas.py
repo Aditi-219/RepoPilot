@@ -56,3 +56,44 @@ class StatusUpdate(BaseModel):
         ...,
         description="Updated lifecycle state for the repository",
     )
+
+
+# -----------------------------------------------------------------------------
+# Phase 2 — Indexing Schemas
+# -----------------------------------------------------------------------------
+
+class IndexResponse(BaseModel):
+    """Response returned immediately when an indexing job is triggered.
+
+    The job runs in the background; this response just confirms it started.
+    """
+
+    message: str = Field(..., description="Human-readable confirmation message")
+    repository_id: int = Field(..., description="ID of the repository being indexed")
+    status: str = Field(..., description="New status after triggering ('indexing')")
+
+
+class ChunkResponse(BaseModel):
+    """Response schema for a single indexed code chunk.
+
+    Returned by the chunks listing endpoint. The embedding vector is excluded
+    from API responses — it is only used internally for vector similarity search.
+    """
+
+    id: int = Field(..., description="Chunk primary key")
+    repository_id: int = Field(..., description="Parent repository ID")
+    file_path: str = Field(..., description="Relative file path in the repository")
+    start_line: int = Field(..., description="First line number of this chunk (1-indexed)")
+    end_line: int = Field(..., description="Last line number of this chunk (1-indexed)")
+    content: str = Field(..., description="Raw source text of the chunk")
+    language: str | None = Field(None, description="Detected programming language")
+    created_at: datetime = Field(..., description="Timestamp when this chunk was indexed")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ChunkCountResponse(BaseModel):
+    """Response for the chunk count endpoint."""
+
+    repository_id: int = Field(..., description="Repository ID")
+    chunk_count: int = Field(..., description="Total number of indexed chunks")
