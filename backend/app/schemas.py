@@ -45,7 +45,6 @@ class RepositoryResponse(BaseModel):
     created_at: datetime = Field(..., description="Registration timestamp")
 
     # Enables automatic mapping from SQLAlchemy ORM instances to Pydantic models.
-    # (e.g., db_repo.full_name -> RepositoryResponse.full_name)
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -70,7 +69,7 @@ class IndexResponse(BaseModel):
 
     message: str = Field(..., description="Human-readable confirmation message")
     repository_id: int = Field(..., description="ID of the repository being indexed")
-    status: str = Field(..., description="New status after triggering ('indexing')")
+    status: RepositoryStatus = Field(..., description="New status after triggering ('indexing')")
 
 
 class ChunkResponse(BaseModel):
@@ -97,3 +96,106 @@ class ChunkCountResponse(BaseModel):
 
     repository_id: int = Field(..., description="Repository ID")
     chunk_count: int = Field(..., description="Total number of indexed chunks")
+
+
+# -----------------------------------------------------------------------------
+# Phase 3 — RAG Search & Q&A Schemas
+# -----------------------------------------------------------------------------
+
+class SearchQuery(BaseModel):
+    """Request body for the hybrid search endpoint.
+
+    The search combines pgvector semantic similarity and PostgreSQL full-text
+    search, fused via Reciprocal Rank Fusion.
+    """
+
+    query: str = Field(
+        ...,
+        description="Natural language search query about the codebase",
+        examples=["Where is authentication handled?"],
+    )
+    limit: int = Field(
+        default=8,
+        ge=1,
+        le=50,
+        description="Number of results to return after retrieval and reranking",
+    )
+    rerank: bool = Field(
+        default=True,
+        description="Whether to apply cross-encoder reranking for higher precision",
+    )
+
+
+class CodeCitation(BaseModel):
+    """A single retrieved code chunk with full source attribution.
+
+    Used as citations in both search and Q&A responses. The score field
+    holds the RRF score before reranking, or the cross-encoder logit after.
+    """
+
+    chunk_id: int = Field(..., description="Database primary key of the code chunk")
+    repository_id: int = Field(..., description="Parent repository ID")
+    file_path: str = Field(..., description="Relative file path in the repository")
+    start_line: int = Field(..., description="First line of this chunk (1-indexed)")
+    end_line: int = Field(..., description="Last line of this chunk (1-indexed)")
+    content: str = Field(..., description="Raw source text of the chunk")
+    language: str | None = Field(None, description="Detected programming language")
+    score: float = Field(..., description="Relevance score (RRF or cross-encoder logit)")
+
+
+class SearchResponse(BaseModel):
+    """Response from the hybrid search endpoint."""
+
+    query: str = Field(..., description="The original search query")
+    repository_id: int = Field(..., description="Repository that was searched")
+    results: list[CodeCitation] = Field(
+        ...,
+        description="Ranked list of matching code chunks with citations",
+    )
+
+
+class AskQuery(BaseModel):
+    """Request body for the RAG Q&A endpoint.
+
+    Triggers the full pipeline: hybrid retrieval -> cross-encoder reranking
+    -> prompt construction -> Gemini generation.
+    """
+
+    question: str = Field(
+        ...,
+        description="Natural language question about the codebase",
+        examples=["Why might this API return a 404?"],
+    )
+    top_k: int = Field(
+        default=8,
+        ge=1,
+        le=20,
+        description="Number of code snippets to retrieve and use as LLM context",
+    )
+
+
+class AskResponse(BaseModel):
+    """Response from the RAG Q&A endpoint.
+
+    Contains the AI-generated answer grounded in retrieved code snippets,
+    plus the full citations so the frontend can display clickable file links.
+    """
+
+    question: str = Field(..., description="The original question")
+    answer: str = Field(
+        ...,
+        description=(
+            "AI-generated answer grounded in retrieved code snippets. "
+            "If no LLM key is configured, contains a notice and the citations "
+            "alone are still returned."
+        ),
+    )
+    citations: list[CodeCitation] = Field(
+        ...,
+        description="Code snippets used as context for generation, in ranked order",
+    )
+    model: str = Field(
+        ...,
+        description="LLM model name used for generation, or 'none' if no key is set",
+    )
+    repository_id: int = Field(..., description="Repository that was queried")

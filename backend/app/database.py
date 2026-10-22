@@ -12,6 +12,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 # 1. Load environment variables from the .env file (e.g., DATABASE_URL)
+# Loaded here because database.py is imported before main.py's startup code runs.
 load_dotenv()
 
 # 2. Retrieve the PostgreSQL connection string
@@ -57,11 +58,8 @@ def get_db() -> Generator[Session, None, None]:
     How it works:
     1. A new Session is created when an endpoint receives a request.
     2. 'yield db' passes the active session to the route handler.
-    3. The 'finally' block ensures the session is cleanly closed once the
-       request finishes, preventing connection leaks.
+    3. The context manager ensures the session is cleanly closed once the
+       request finishes, preventing connection leaks (no manual close needed).
     """
-    db = SessionLocal()
-    try:
+    with SessionLocal() as db:
         yield db
-    finally:
-        db.close()

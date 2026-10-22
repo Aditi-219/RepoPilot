@@ -30,9 +30,10 @@ SUPPORTED_EXTENSIONS: frozenset[str] = frozenset({
     ".html", ".css", ".sh", ".bash",
 })
 
-# Skip files larger than this many bytes (100 KB) to avoid indexing
+# Skip files larger than this many bytes to avoid indexing
 # generated, minified, or vendor files that add noise.
-MAX_FILE_BYTES: int = 100 * 1024  # 100 KB
+# Reads MAX_FILE_SIZE_KB from the environment (default: 100 KB).
+MAX_FILE_BYTES: int = int(os.getenv("MAX_FILE_SIZE_KB", "100")) * 1024
 
 
 def _build_headers() -> dict[str, str]:
@@ -49,6 +50,18 @@ def _build_headers() -> dict[str, str]:
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
+
+
+def _get_file_extension(path: str) -> str:
+    """Extract the lowercased dot-prefixed extension from a file path.
+
+    Args:
+        path: A file path string (e.g., 'src/utils/parser.py').
+
+    Returns:
+        Lowercased extension with leading dot (e.g., '.py'), or '' if none.
+    """
+    return "." + path.rsplit(".", 1)[-1].lower() if "." in path else ""
 
 
 def parse_github_url(url: str) -> tuple[str, str]:
@@ -260,8 +273,8 @@ async def fetch_repo_tree(owner: str, repo: str) -> list[dict[str, Any]]:
         path: str = item.get("path", "")
         size: int = item.get("size", 0)
 
-        # Check extension
-        ext = "." + path.rsplit(".", 1)[-1].lower() if "." in path else ""
+        # Check extension using shared helper
+        ext = _get_file_extension(path)
         if ext not in SUPPORTED_EXTENSIONS:
             continue
 

@@ -6,11 +6,12 @@ numbers) on every chunk.
 
 Strategy:
 - Uses tiktoken (cl100k_base encoding) to count tokens accurately
-- Default chunk size: 400 tokens
-- Default overlap: 50 tokens (preserves context across chunk boundaries)
+- Default chunk size: 400 tokens (configurable via CHUNK_SIZE_TOKENS env var)
+- Default overlap: 50 tokens (configurable via CHUNK_OVERLAP_TOKENS env var)
 - Markdown files are split on headings (##) for better semantic coherence
 """
 
+import os
 from dataclasses import dataclass
 
 import tiktoken
@@ -19,6 +20,12 @@ import tiktoken
 # cl100k_base is the encoding used by text-embedding-3-small and GPT-4.
 # It gives accurate token counts even when using sentence-transformers for embedding.
 _ENCODING = tiktoken.get_encoding("cl100k_base")
+
+# Chunk size and overlap are read from the environment at module load time,
+# matching the values defined in .env (CHUNK_SIZE_TOKENS / CHUNK_OVERLAP_TOKENS).
+# Hardcoded fallbacks (400 / 50) are used when the env vars are absent.
+DEFAULT_CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE_TOKENS", "400"))
+DEFAULT_CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP_TOKENS", "50"))
 
 # Map file extensions to human-readable language names stored in the DB
 EXTENSION_TO_LANGUAGE: dict[str, str] = {
@@ -236,8 +243,8 @@ def _chunk_markdown(
 def chunk_file(
     file_path: str,
     content: str,
-    chunk_size: int = 400,
-    overlap: int = 50,
+    chunk_size: int = DEFAULT_CHUNK_SIZE,
+    overlap: int = DEFAULT_CHUNK_OVERLAP,
 ) -> list[Chunk]:
     """Split a file's content into searchable chunks.
 
@@ -248,8 +255,8 @@ def chunk_file(
     Args:
         file_path:  Relative path of the file in the repository.
         content:    Full text content of the file.
-        chunk_size: Maximum number of tokens per chunk (default: 400).
-        overlap:    Overlap tokens between consecutive chunks (default: 50).
+        chunk_size: Maximum number of tokens per chunk (default: CHUNK_SIZE_TOKENS env var or 400).
+        overlap:    Overlap tokens between consecutive chunks (default: CHUNK_OVERLAP_TOKENS env var or 50).
 
     Returns:
         List of Chunk objects. Returns an empty list for empty files.
@@ -257,10 +264,10 @@ def chunk_file(
     if not content or not content.strip():
         return []
 
-    ext = "." + file_path.rsplit(".", 1)[-1].lower() if "." in file_path else ""
     language = _detect_language(file_path)
 
-    if ext == ".md":
+    # Use a simple suffix check to avoid re-extracting the extension
+    if file_path.endswith(".md"):
         return _chunk_markdown(content, file_path, chunk_size, overlap)
 
     lines = content.splitlines(keepends=True)
