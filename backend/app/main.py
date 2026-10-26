@@ -12,14 +12,15 @@ import logging
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
-
+from app.agent.checkpoint import close_checkpointer, init_checkpointer
 from app.database import Base, engine
+from app.routers.chat import router as chat_router
 from app.routers.indexing import router as indexing_router
 from app.routers.rag import router as rag_router
 from app.routers.repositories import router as repositories_router
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 # ---------------------------------------------------------------------------
 # Application Configuration & Logging
@@ -79,8 +80,13 @@ async def lifespan(app: FastAPI):
         # Non-fatal: search will still function with sequential table scans
         logger.warning("Could not create search indexes (non-fatal): %s", exc)
 
+    # 3. Initialize LangGraph durable checkpointer
+    await init_checkpointer()
+
     yield
 
+    # Shutdown checkpointer connections
+    await close_checkpointer()
     logger.info("Shutting down RepoPilot API...")
 
 
@@ -132,3 +138,4 @@ def health() -> dict[str, str]:
 app.include_router(repositories_router)
 app.include_router(indexing_router)
 app.include_router(rag_router)
+app.include_router(chat_router)

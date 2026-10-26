@@ -8,15 +8,14 @@ This module provides endpoints for:
 import asyncio
 import logging
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-
-from app.database import get_db
+from app.database import SessionLocal, get_db
 from app.llm_service import ask_with_llm
 from app.reranker import rerank
 from app.routers.helpers import get_repository_or_404, require_indexed
 from app.schemas import AskQuery, AskResponse, CodeCitation, SearchQuery, SearchResponse
-from app.search import hybrid_search
+from app.search import SearchResult, hybrid_search
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +23,17 @@ router = APIRouter(
     prefix="/api/repositories",
     tags=["RAG & Search"],
 )
+
+
+def _retrieve_and_rerank(repository_id: int, query: str, top_k: int) -> list[SearchResult]:
+    """Execute hybrid retrieval and reranking with an isolated database session.
+
+    Running inside an isolated session prevents passing request-scoped SQLAlchemy
+    sessions across async thread boundaries.
+    """
+    with SessionLocal() as session:
+        candidates = hybrid_search(session, repository_id, query, limit=top_k * 3)
+        return rerank(query, candidates, top_k=top_k)
 
 
 @router.post(
@@ -121,24 +131,15 @@ async def ask_repository(
     repo = get_repository_or_404(db, repository_id)
     require_indexed(repo)
 
-    # 1. Hybrid retrieval (runs in thread pool to prevent blocking the async event loop)
-    candidates = await asyncio.to_thread(
-        hybrid_search,
-        db,
+    # 1. Hybrid retrieval & reranking in thread pool using an isolated session
+    snippets = await asyncio.to_thread(
+        _retrieve_and_rerank,
         repository_id,
         payload.question,
-        payload.top_k * 3,
-    )
-
-    # 2. Rerank candidates
-    snippets = await asyncio.to_thread(
-        rerank,
-        payload.question,
-        candidates,
         payload.top_k,
     )
 
-    # 3. LLM generation with graceful degradation if API key/Ollama is missing
+    # 2. LLM generation with graceful degradation if API key/Ollama is missing
     try:
         answer, model_used = await ask_with_llm(payload.question, snippets)
     except RuntimeError as exc:

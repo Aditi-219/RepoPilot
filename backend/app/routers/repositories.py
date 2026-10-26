@@ -11,15 +11,14 @@ This module provides REST API endpoints for:
 import logging
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-
 from app.database import get_db
 from app.github_service import fetch_repository
 from app.models import Repository
 from app.routers.helpers import get_repository_or_404
 from app.schemas import RepositoryCreate, RepositoryResponse, StatusUpdate
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -80,12 +79,12 @@ async def create_repository(
     try:
         db.commit()
         db.refresh(repository)
-    except Exception:
+    except Exception as exc:
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Could not save repository to the database.",
-        )
+        ) from exc
 
     logger.info("Registered new repository: %s (id=%d)", repository.full_name, repository.id)
     return repository

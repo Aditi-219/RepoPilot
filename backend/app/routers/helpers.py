@@ -4,10 +4,9 @@ This module contains common validation and retrieval functions used across
 different route handlers (repositories, indexing, RAG).
 """
 
+from app.models import Repository
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
-
-from app.models import Repository
 
 
 def get_repository_or_404(db: Session, repository_id: int) -> Repository:

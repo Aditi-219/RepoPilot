@@ -12,7 +12,7 @@ import base64
 import os
 import re
 from typing import Any
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 import httpx
 from fastapi import HTTPException
@@ -174,12 +174,12 @@ async def fetch_repository(url: str) -> dict[str, Any]:
         raise HTTPException(
             status_code=504,
             detail="GitHub API request timed out. Please try again later.",
-        )
+        ) from None
     except httpx.RequestError as exc:
         raise HTTPException(
             status_code=502,
             detail=f"Could not connect to GitHub API ({type(exc).__name__}). Please check network connectivity.",
-        )
+        ) from exc
 
     # Handle GitHub API specific HTTP response statuses
     if response.status_code == 404:
@@ -250,9 +250,9 @@ async def fetch_repo_tree(owner: str, repo: str) -> list[dict[str, Any]]:
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
             response = await client.get(api_url, headers=_build_headers())
     except httpx.TimeoutException:
-        raise HTTPException(status_code=504, detail="GitHub API timed out fetching file tree.")
+        raise HTTPException(status_code=504, detail="GitHub API timed out fetching file tree.") from None
     except httpx.RequestError as exc:
-        raise HTTPException(status_code=502, detail=f"Network error fetching file tree: {exc}")
+        raise HTTPException(status_code=502, detail=f"Network error fetching file tree: {exc}") from exc
 
     if response.status_code == 404:
         raise HTTPException(status_code=404, detail="Repository not found or has no commits.")
@@ -306,7 +306,13 @@ async def fetch_file_content(owner: str, repo: str, path: str) -> str | None:
     Raises:
         HTTPException: On network errors or rate limits.
     """
-    api_url = f"{GITHUB_API}/repos/{owner}/{repo}/contents/{path}"
+    # Sanitize and quote the path to prevent directory traversal and handle spaces/special characters
+    clean_path = path.strip("/")
+    if ".." in clean_path.split("/"):
+        return None
+
+    encoded_path = quote(clean_path, safe="/")
+    api_url = f"{GITHUB_API}/repos/{owner}/{repo}/contents/{encoded_path}"
 
     try:
         async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:

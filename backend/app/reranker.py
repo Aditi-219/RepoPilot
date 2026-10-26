@@ -6,6 +6,7 @@ so responses return in milliseconds without hanging.
 """
 
 import logging
+
 from app.search import SearchResult
 
 logger = logging.getLogger(__name__)

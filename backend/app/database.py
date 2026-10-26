@@ -5,14 +5,17 @@ generator for FastAPI route dependencies.
 """
 
 import os
-from typing import Generator
+from collections.abc import Generator
+from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-# 1. Load environment variables from the .env file (e.g., DATABASE_URL)
-# Loaded here because database.py is imported before main.py's startup code runs.
+# 1. Load environment variables from backend/.env or current working directory
+backend_env = Path(__file__).resolve().parent.parent / ".env"
+if backend_env.is_file():
+    load_dotenv(dotenv_path=backend_env)
 load_dotenv()
 
 # 2. Retrieve the PostgreSQL connection string
@@ -48,7 +51,6 @@ SessionLocal = sessionmaker(
 # In SQLAlchemy 2.0, all ORM models inherit from DeclarativeBase.
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy ORM models in RepoPilot."""
-    pass
 
 
 # 6. Database Dependency for FastAPI Endpoints

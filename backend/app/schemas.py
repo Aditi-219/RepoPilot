@@ -199,3 +199,65 @@ class AskResponse(BaseModel):
         description="LLM model name used for generation, or 'none' if no key is set",
     )
     repository_id: int = Field(..., description="Repository that was queried")
+
+
+# -----------------------------------------------------------------------------
+# Phase 4 & 5 — LangGraph Chat Sessions & Streaming Schemas
+# -----------------------------------------------------------------------------
+
+class ChatSessionCreate(BaseModel):
+    """Request payload to create a new chat session."""
+
+    title: str | None = Field(
+        None,
+        max_length=255,
+        description="Optional title for the conversation session (defaults to 'New Conversation')",
+    )
+
+
+class ChatSessionResponse(BaseModel):
+    """Response representation of a persistent chat session."""
+
+    id: str = Field(..., description="Unique UUID identifying the session (thread_id)")
+    repository_id: int = Field(..., description="Parent repository database ID")
+    title: str = Field(..., description="Title of the session")
+    created_at: datetime = Field(..., description="Session creation timestamp")
+    updated_at: datetime = Field(..., description="Last message activity timestamp")
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ChatMessageItem(BaseModel):
+    """A single normalized message in a conversation thread."""
+
+    id: str | None = Field(None, description="Message unique identifier")
+    role: Literal["user", "assistant", "tool", "system"] = Field(
+        ...,
+        description="Sender role",
+    )
+    content: str = Field(..., description="Text content of the message")
+    tool_calls: list[dict] | None = Field(
+        None,
+        description="Tool invocations emitted by the assistant",
+    )
+
+
+class ChatHistoryResponse(BaseModel):
+    """Full message history retrieved from checkpoints for resuming a conversation."""
+
+    session_id: str = Field(..., description="Session identifier (thread_id)")
+    repository_id: int = Field(..., description="Repository ID")
+    title: str = Field(..., description="Session title")
+    messages: list[ChatMessageItem] = Field(..., description="Chronological message history")
+
+
+class ChatStreamRequest(BaseModel):
+    """User prompt payload for streaming chat."""
+
+    message: str = Field(
+        ...,
+        min_length=1,
+        description="User message or question about the codebase",
+        examples=["How is error handling structured in this repository?"],
+    )
+

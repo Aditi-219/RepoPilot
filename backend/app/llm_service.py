@@ -10,8 +10,8 @@ RepoPilot automatically uses it without hitting any daily rate limits.
 
 import logging
 import os
-import httpx
 
+import httpx
 from app.search import SearchResult
 
 logger = logging.getLogger(__name__)
@@ -20,8 +20,9 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 PREFERRED_OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "")
 
 CANDIDATE_GEMINI_MODELS = [
-    "gemini-flash-latest",
+    "gemini-3.5-flash-lite",
     "gemini-3.8-flash",
+    "gemini-flash-latest",
     "gemma-4-26b-a4b-it",
 ]
 

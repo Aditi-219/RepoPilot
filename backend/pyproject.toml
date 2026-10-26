@@ -1,0 +1,15 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "PIE"]
+ignore = [
+    "B008",  # Allow FastAPI Depends and Query in function signature defaults
+    "E501",  # Allow long lines (useful for LLM prompt strings and descriptive API errors)
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"

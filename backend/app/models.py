@@ -6,11 +6,10 @@ RepoPilot. It uses SQLAlchemy 2.0 type-annotated 'Mapped' columns.
 
 from datetime import datetime
 
+from app.database import Base
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.database import Base
 
 
 class Repository(Base):
@@ -86,6 +85,13 @@ class Repository(Base):
     # One-to-many relationship: a repo has many indexed code chunks
     chunks: Mapped[list["CodeChunk"]] = relationship(
         "CodeChunk",
+        back_populates="repository",
+        cascade="all, delete-orphan",
+    )
+
+    # One-to-many relationship: a repo has many persistent chat sessions
+    chat_sessions: Mapped[list["ChatSession"]] = relationship(
+        "ChatSession",
         back_populates="repository",
         cascade="all, delete-orphan",
     )
@@ -168,3 +174,52 @@ class CodeChunk(Base):
             f"<CodeChunk(id={self.id}, repo_id={self.repository_id}, "
             f"file='{self.file_path}', lines={self.start_line}-{self.end_line})>"
         )
+
+
+class ChatSession(Base):
+    """Represents a persistent conversation session for a repository.
+
+    The session ID acts as the thread_id for LangGraph checkpoint persistence.
+    """
+
+    __tablename__ = "chat_sessions"
+
+    # UUID thread_id for LangGraph checkpointer
+    id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+    )
+
+    # Parent repository ID
+    repository_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("repositories.id", ondelete="CASCADE"),
+        index=True,
+        nullable=False,
+    )
+
+    # Human-readable title (defaults to 'New Conversation', auto-updated from first user query)
+    title: Mapped[str] = mapped_column(
+        String(255),
+        default="New Conversation",
+    )
+
+    # Created and updated timestamps
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+    # Relationship to parent repository
+    repository: Mapped["Repository"] = relationship(
+        "Repository",
+        back_populates="chat_sessions",
+    )
+
+    def __repr__(self) -> str:
+        return f"<ChatSession(id='{self.id}', repo_id={self.repository_id}, title='{self.title}')>"

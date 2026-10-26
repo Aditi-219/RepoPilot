@@ -113,3 +113,176 @@ export async function triggerRepositoryIndexing(repoId) {
     method: "POST",
   });
 }
+
+// ---------------------------------------------------------------------------
+// RAG & Search Endpoints
+// ---------------------------------------------------------------------------
+
+/**
+ * Perform hybrid semantic + full-text search across indexed chunks.
+ * POST /api/repositories/:id/search
+ *
+ * @param {number|string} repoId
+ * @param {string} query
+ * @param {number} [limit=8]
+ * @param {boolean} [rerank=true]
+ */
+export async function searchRepository(repoId, query, limit = 8, rerank = true) {
+  return apiFetch(`/repositories/${repoId}/search`, {
+    method: "POST",
+    body: JSON.stringify({ query, limit, rerank }),
+  });
+}
+
+/**
+ * Ask a codebase question with grounded AI answer generation.
+ * POST /api/repositories/:id/ask
+ *
+ * @param {number|string} repoId
+ * @param {string} question
+ * @param {number} [topK=8]
+ */
+export async function askRepository(repoId, question, topK = 8) {
+  return apiFetch(`/repositories/${repoId}/ask`, {
+    method: "POST",
+    body: JSON.stringify({ question, top_k: topK }),
+  });
+}
+
+// ---------------------------------------------------------------------------
+// LangGraph Chat Sessions & Streaming Endpoints
+// ---------------------------------------------------------------------------
+
+/**
+ * List all chat sessions for a repository.
+ * GET /api/chat/:repoId/sessions
+ *
+ * @param {number|string} repoId
+ */
+export async function listChatSessions(repoId) {
+  return apiFetch(`/chat/${repoId}/sessions`);
+}
+
+/**
+ * Create a new chat session (thread_id) for a repository.
+ * POST /api/chat/:repoId/sessions
+ *
+ * @param {number|string} repoId
+ * @param {string} [title]
+ */
+export async function createChatSession(repoId, title = "New Conversation") {
+  return apiFetch(`/chat/${repoId}/sessions`, {
+    method: "POST",
+    body: JSON.stringify({ title }),
+  });
+}
+
+/**
+ * Retrieve message history for a chat session from checkpoints.
+ * GET /api/chat/sessions/:sessionId/history
+ *
+ * @param {string} sessionId
+ */
+export async function getChatHistory(sessionId) {
+  return apiFetch(`/chat/sessions/${sessionId}/history`);
+}
+
+/**
+ * Delete a chat session.
+ * DELETE /api/chat/sessions/:sessionId
+ *
+ * @param {string} sessionId
+ */
+export async function deleteChatSession(sessionId) {
+  return apiFetch(`/chat/sessions/${sessionId}`, {
+    method: "DELETE",
+  });
+}
+
+/**
+ * Stream conversational agent response using Server-Sent Events (SSE).
+ * POST /api/chat/:repoId/sessions/:sessionId/stream
+ *
+ * @param {number|string} repoId
+ * @param {string} sessionId
+ * @param {string} message
+ * @param {Object} handlers
+ * @param {(token: string) => void} handlers.onToken - Called on each streaming text token delta
+ * @param {(tool: string, args: any) => void} [handlers.onToolStart] - Called when a tool begins
+ * @param {(tool: string, output: string) => void} [handlers.onToolEnd] - Called when a tool finishes
+ * @param {(err: Error) => void} [handlers.onError] - Called on network or generation error
+ * @param {() => void} [handlers.onDone] - Called when stream completes
+ */
+export async function streamChatMessage(
+  repoId,
+  sessionId,
+  message,
+  { onToken, onToolStart, onToolEnd, onError, onDone } = {}
+) {
+  const url = `${API_BASE_URL}/chat/${repoId}/sessions/${sessionId}/stream`;
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+
+    if (!response.ok) {
+      const errJson = await response.json().catch(() => ({}));
+      throw new Error(errJson.detail || `Stream failed with status ${response.status}`);
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+    let doneCalled = false;
+
+    const safeDone = () => {
+      if (!doneCalled && onDone) {
+        doneCalled = true;
+        onDone();
+      }
+    };
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n\n");
+      // Keep incomplete trailing segment in buffer
+      buffer = lines.pop() || "";
+
+      for (const block of lines) {
+        const trimmed = block.trim();
+        if (!trimmed.startsWith("data:")) continue;
+
+        const payloadStr = trimmed.replace(/^data:\s*/, "").trim();
+        if (!payloadStr) continue;
+
+        try {
+          const data = JSON.parse(payloadStr);
+          if (data.type === "token" && onToken) {
+            onToken(data.delta);
+          } else if (data.type === "tool_start" && onToolStart) {
+            onToolStart(data.tool, data.args);
+          } else if (data.type === "tool_end" && onToolEnd) {
+            onToolEnd(data.tool, data.output);
+          } else if (data.type === "error" && onError) {
+            onError(new Error(data.error));
+          } else if (data.type === "done") {
+            safeDone();
+          }
+        } catch {
+          // Ignore malformed JSON chunks
+        }
+      }
+    }
+
+    safeDone();
+  } catch (err) {
+    if (onError) onError(err);
+    else throw err;
+  }
+}

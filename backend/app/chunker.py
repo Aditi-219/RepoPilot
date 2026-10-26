@@ -24,8 +24,8 @@ _ENCODING = tiktoken.get_encoding("cl100k_base")
 # Chunk size and overlap are read from the environment at module load time,
 # matching the values defined in .env (CHUNK_SIZE_TOKENS / CHUNK_OVERLAP_TOKENS).
 # Hardcoded fallbacks (400 / 50) are used when the env vars are absent.
-DEFAULT_CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE_TOKENS", "400"))
-DEFAULT_CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP_TOKENS", "50"))
+DEFAULT_CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE_TOKENS", "200"))
+DEFAULT_CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP_TOKENS", "40"))
 
 # Map file extensions to human-readable language names stored in the DB
 EXTENSION_TO_LANGUAGE: dict[str, str] = {
@@ -202,7 +202,7 @@ def _chunk_markdown(
 
     for i, line in enumerate(lines, start=1):
         stripped = line.lstrip()
-        is_heading = stripped.startswith("## ") or stripped.startswith("### ")
+        is_heading = stripped.startswith(("## ", "### "))
         if is_heading and current_section:
             sections.append(current_section)
             section_start.append(current_start)
@@ -218,7 +218,7 @@ def _chunk_markdown(
     chunks: list[Chunk] = []
     language = "markdown"
 
-    for section_lines, s_start in zip(sections, section_start):
+    for section_lines, s_start in zip(sections, section_start, strict=False):
         section_text = "".join(section_lines)
         if _count_tokens(section_text) <= chunk_size:
             # Small section — emit as a single chunk

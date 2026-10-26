@@ -16,14 +16,13 @@ This function runs as a background task with an isolated database session.
 import asyncio
 import logging
 
-from sqlalchemy import delete
-from sqlalchemy.orm import Session
-
 from app.chunker import Chunk, chunk_file
 from app.database import SessionLocal
 from app.embedder import embed_chunks
 from app.github_service import fetch_file_content, fetch_repo_tree, parse_github_url
 from app.models import CodeChunk, Repository
+from sqlalchemy import delete
+from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +98,7 @@ async def index_repository(repository_id: int) -> None:
                         language=chunk.language,
                         embedding=vector,
                     )
-                    for chunk, vector in zip(pending_chunks, vectors)
+                    for chunk, vector in zip(pending_chunks, vectors, strict=False)
                 ]
 
                 db.add_all(db_chunks)
