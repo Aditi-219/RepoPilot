@@ -3,6 +3,8 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from fastapi import HTTPException
+
 from app.agent.evaluation import (
     evaluate_citation_presence,
     evaluate_keyword_grounding,
@@ -10,7 +12,6 @@ from app.agent.evaluation import (
     sync_evaluation_dataset,
 )
 from app.tools.github_tools import fetch_repo_metadata, inspect_file_tree, read_source_file
-from fastapi import HTTPException
 
 
 class DummyRun:

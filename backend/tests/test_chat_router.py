@@ -3,13 +3,14 @@
 from collections.abc import Generator
 
 import pytest
+from fastapi.testclient import TestClient
+from langchain_core.messages import AIMessage, HumanMessage
+from langgraph.checkpoint.memory import MemorySaver
+
 from app.agent.checkpoint import set_checkpointer
 from app.database import Base, SessionLocal, engine
 from app.main import app
 from app.models import Repository
-from fastapi.testclient import TestClient
-from langchain_core.messages import AIMessage, HumanMessage
-from langgraph.checkpoint.memory import MemorySaver
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -119,6 +120,7 @@ def test_get_session_history_with_checkpointed_messages(client):
     graph = create_agent_graph(model=StaticModel(), checkpointer=mem_checkpointer)
 
     import asyncio
+
     asyncio.run(
         graph.ainvoke(
             {"messages": [HumanMessage(content="Explain the architecture")]},
@@ -190,4 +192,41 @@ def test_stream_chat_sse_endpoint(client):
         assert '{"type": "done"}' in body
 
     # Clean up
+    client.delete(f"/api/chat/sessions/{session_id}")
+
+
+def test_stream_chat_handles_recursion_error_gracefully(client):
+    """Verify that GraphRecursionError yields a friendly error event instead of a raw crash."""
+    from unittest.mock import MagicMock, patch
+
+    from langgraph.errors import GraphRecursionError
+
+    with SessionLocal() as db:
+        repo = db.query(Repository).filter_by(full_name="test/repo").first()
+        repo_id = repo.id
+
+    create_res = client.post(f"/api/chat/{repo_id}/sessions")
+    session_id = create_res.json()["id"]
+
+    mock_graph = MagicMock()
+
+    async def mock_astream_events(*args, **kwargs):
+        raise GraphRecursionError("Recursion limit of 15 reached without hitting a stop condition.")
+        yield  # Make it an async generator
+
+    mock_graph.astream_events = mock_astream_events
+
+    with patch("app.routers.chat.create_agent_graph", return_value=mock_graph):
+        stream_res = client.post(
+            f"/api/chat/{repo_id}/sessions/{session_id}/stream",
+            json={"message": "Deep search query"},
+        )
+        assert stream_res.status_code == 200
+        assert "text/event-stream" in stream_res.headers["content-type"]
+
+        body = stream_res.text
+        assert '{"type": "error"' in body
+        assert "maximum step limit" in body
+        assert "AGENT_RECURSION_LIMIT" in body
+
     client.delete(f"/api/chat/sessions/{session_id}")

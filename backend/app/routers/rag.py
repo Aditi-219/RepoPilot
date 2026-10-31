@@ -8,14 +8,15 @@ This module provides endpoints for:
 import asyncio
 import logging
 
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
 from app.database import SessionLocal, get_db
 from app.llm_service import ask_with_llm
 from app.reranker import rerank
 from app.routers.helpers import get_repository_or_404, require_indexed
 from app.schemas import AskQuery, AskResponse, CodeCitation, SearchQuery, SearchResponse
 from app.search import SearchResult, hybrid_search
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 

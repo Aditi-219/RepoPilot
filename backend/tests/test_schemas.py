@@ -1,8 +1,9 @@
 """Unit tests for Pydantic request/response schemas."""
 
 import pytest
-from app.schemas import AskQuery, RepositoryCreate, SearchQuery, StatusUpdate
 from pydantic import ValidationError
+
+from app.schemas import AskQuery, RepositoryCreate, SearchQuery, StatusUpdate
 
 
 def test_repository_create_valid():

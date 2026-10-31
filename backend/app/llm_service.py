@@ -12,6 +12,7 @@ import logging
 import os
 
 import httpx
+
 from app.search import SearchResult
 
 logger = logging.getLogger(__name__)

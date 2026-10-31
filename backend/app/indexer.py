@@ -3,7 +3,7 @@
 This module orchestrates the full ingestion pipeline:
   1. Mark repository status as 'indexing'
   2. Fetch the full file tree from GitHub
-  3. Download each supported file's content
+  3. Download all supported files concurrently (bounded by a semaphore)
   4. Chunk each file into overlapping token-bounded segments
   5. Generate 384-dim embeddings for each chunk in worker threads
   6. Bulk-insert all CodeChunk rows into PostgreSQL
@@ -16,18 +16,23 @@ This function runs as a background task with an isolated database session.
 import asyncio
 import logging
 
+from sqlalchemy import delete
+from sqlalchemy.orm import Session
+
 from app.chunker import Chunk, chunk_file
 from app.database import SessionLocal
 from app.embedder import embed_chunks
 from app.github_service import fetch_file_content, fetch_repo_tree, parse_github_url
 from app.models import CodeChunk, Repository
-from sqlalchemy import delete
-from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
 # How many chunks to embed and insert in a single DB transaction.
 BATCH_SIZE = 64
+
+# Maximum concurrent GitHub file download requests.
+# Prevents overwhelming the GitHub API while keeping downloads fast.
+_DOWNLOAD_CONCURRENCY = 10
 
 
 def _set_status(db: Session, repo: Repository, status: str) -> None:
@@ -73,7 +78,7 @@ async def index_repository(repository_id: int) -> None:
                 _set_status(db, repo, "completed")
                 return
 
-            # 4. Process files: fetch → chunk → batch embed → insert
+            # 4. Process files: fetch all concurrently → chunk → batch embed → insert
             total_chunks_inserted = 0
             pending_chunks: list[Chunk] = []
 
@@ -108,19 +113,36 @@ async def index_repository(repository_id: int) -> None:
                 logger.info("Inserted batch of %d chunks (total so far: %d)", len(db_chunks), total_chunks_inserted)
                 pending_chunks = []
 
-            for i, file_entry in enumerate(file_entries, start=1):
+            # Concurrently download all files, bounded by _DOWNLOAD_CONCURRENCY to
+            # avoid saturating the GitHub API or local event loop.
+            sem = asyncio.Semaphore(_DOWNLOAD_CONCURRENCY)
+
+            async def fetch_and_chunk(file_entry: dict) -> list[Chunk]:
+                """Download one file and return its chunks, or [] on failure."""
                 file_path: str = file_entry["path"]
-                logger.debug("[%d/%d] Fetching %s", i, len(file_entries), file_path)
-
-                content = await fetch_file_content(owner, repo_name, file_path)
+                async with sem:
+                    content = await fetch_file_content(owner, repo_name, file_path)
                 if not content:
-                    continue
+                    return []
+                return chunk_file(file_path, content)
 
-                file_chunks = chunk_file(file_path, content)
-                if not file_chunks:
-                    continue
+            logger.info(
+                "Downloading %d files with concurrency=%d",
+                len(file_entries),
+                _DOWNLOAD_CONCURRENCY,
+            )
+            download_results = await asyncio.gather(
+                *[fetch_and_chunk(entry) for entry in file_entries],
+                return_exceptions=True,
+            )
 
-                pending_chunks.extend(file_chunks)
+            for result in download_results:
+                if isinstance(result, BaseException):
+                    # Log but skip individual file failures so one bad file
+                    # does not abort the whole repository index run.
+                    logger.warning("File download/chunk failed (skipping): %s", result)
+                    continue
+                pending_chunks.extend(result)
                 await flush_batch(force=False)
 
             # Final flush of leftover chunks

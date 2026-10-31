@@ -1,8 +1,9 @@
 """Unit tests for GitHub service URL validation and path handling."""
 
 import pytest
-from app.github_service import _get_file_extension, parse_github_url
 from fastapi import HTTPException
+
+from app.github_service import _get_file_extension, parse_github_url
 
 
 def test_get_file_extension():

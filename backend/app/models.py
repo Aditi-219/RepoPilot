@@ -6,10 +6,11 @@ RepoPilot. It uses SQLAlchemy 2.0 type-annotated 'Mapped' columns.
 
 from datetime import datetime
 
-from app.database import Base
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.database import Base
 
 
 class Repository(Base):

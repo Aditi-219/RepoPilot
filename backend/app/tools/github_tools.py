@@ -6,9 +6,10 @@ directory structure, and retrieve source code files on demand.
 
 from typing import Any
 
-from app.github_service import fetch_file_content, fetch_repo_tree, fetch_repository
 from fastapi import HTTPException
 from langchain_core.tools import tool
+
+from app.github_service import fetch_file_content, fetch_repo_tree, fetch_repository
 
 
 @tool

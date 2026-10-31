@@ -11,10 +11,13 @@ Strategy:
 - Markdown files are split on headings (##) for better semantic coherence
 """
 
+import logging
 import os
 from dataclasses import dataclass
 
 import tiktoken
+
+logger = logging.getLogger(__name__)
 
 # Tiktoken encoding used for token counting.
 # cl100k_base is the encoding used by text-embedding-3-small and GPT-4.
@@ -26,6 +29,9 @@ _ENCODING = tiktoken.get_encoding("cl100k_base")
 # Hardcoded fallbacks (400 / 50) are used when the env vars are absent.
 DEFAULT_CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE_TOKENS", "200"))
 DEFAULT_CHUNK_OVERLAP: int = int(os.getenv("CHUNK_OVERLAP_TOKENS", "40"))
+
+# Chunking strategy: 'ast' for syntax-tree aware splitting, 'tokens' for sliding window.
+DEFAULT_CHUNK_STRATEGY: str = os.getenv("CHUNK_STRATEGY", "ast").lower()
 
 # Map file extensions to human-readable language names stored in the DB
 EXTENSION_TO_LANGUAGE: dict[str, str] = {
@@ -240,23 +246,253 @@ def _chunk_markdown(
     return chunks
 
 
+_PARSER_CACHE: dict = {}
+
+
+def _get_tree_sitter_parser(language: str | None):
+    """Retrieve or initialize a tree-sitter Parser for the given language.
+
+    Returns:
+        A tree_sitter.Parser instance if supported and available, else None.
+    """
+    if not language:
+        return None
+
+    if language in _PARSER_CACHE:
+        return _PARSER_CACHE[language]
+
+    parser = None
+    try:
+        if language == "python":
+            import tree_sitter
+            import tree_sitter_python
+
+            py_lang = tree_sitter.Language(tree_sitter_python.language())
+            parser = tree_sitter.Parser(py_lang)
+    except Exception as exc:
+        logger.debug("Tree-sitter parser initialization failed for %s: %s", language, exc)
+        parser = None
+
+    _PARSER_CACHE[language] = parser
+    return parser
+
+
+def chunk_file_ast(
+    file_path: str,
+    content: str,
+    language: str | None,
+    chunk_size: int = DEFAULT_CHUNK_SIZE,
+    overlap: int = DEFAULT_CHUNK_OVERLAP,
+) -> list[Chunk]:
+    """Split source code into AST-aware chunks (classes, functions, methods).
+
+    Uses Tree-sitter to identify syntactic boundaries. Complete functions and
+    classes that fit within `chunk_size` are preserved as coherent units.
+    Large definitions are broken down into methods or token-bounded segments.
+
+    Args:
+        file_path:  Relative file path for metadata.
+        content:    Raw source text.
+        language:   Detected language name.
+        chunk_size: Maximum tokens per chunk.
+        overlap:    Overlap tokens when falling back to sliding window.
+
+    Returns:
+        List of Chunk objects.
+    """
+    lines = content.splitlines(keepends=True)
+    parser = _get_tree_sitter_parser(language)
+
+    if parser is None:
+        # Fall back to token-based chunking for unsupported languages
+        return _chunk_by_tokens(lines, file_path, language, chunk_size, overlap)
+
+    try:
+        tree = parser.parse(content.encode("utf-8"))
+    except Exception as exc:
+        logger.warning("Tree-sitter parse failed for %s, falling back to tokens: %s", file_path, exc)
+        return _chunk_by_tokens(lines, file_path, language, chunk_size, overlap)
+
+    chunks: list[Chunk] = []
+    pending_lines: list[str] = []
+    pending_start: int = 1
+
+    def flush_pending(end_line_idx: int) -> None:
+        """Flush accumulated non-definition lines (imports, preamble, comments)."""
+        nonlocal pending_lines, pending_start
+        if not pending_lines:
+            return
+
+        text_block = "".join(pending_lines).rstrip()
+        if text_block:
+            if _count_tokens(text_block) <= chunk_size:
+                chunks.append(
+                    Chunk(
+                        file_path=file_path,
+                        start_line=pending_start,
+                        end_line=end_line_idx,
+                        content=text_block,
+                        language=language,
+                    )
+                )
+            else:
+                chunks.extend(
+                    _chunk_by_tokens(pending_lines, file_path, language, chunk_size, overlap)
+                )
+        pending_lines = []
+
+    def process_node(node, is_top_level: bool = True) -> None:
+        nonlocal pending_start, pending_lines
+        node_type = node.type
+
+        # Unwrap decorated definition (e.g. @decorator\ndef foo(): ...)
+        target_node = node
+        if node_type == "decorated_definition":
+            for child in node.children:
+                if child.type in ("function_definition", "class_definition"):
+                    target_node = child
+                    break
+
+        is_definition = target_node.type in ("function_definition", "class_definition")
+
+        if not is_definition:
+            if not pending_lines:
+                pending_start = node.start_point.row + 1
+            node_lines = lines[node.start_point.row : node.end_point.row + 1]
+            pending_lines.extend(node_lines)
+            return
+
+        # It is a function or class definition. First flush any accumulated preamble.
+        if pending_lines:
+            flush_pending(node.start_point.row)
+
+        start_line = node.start_point.row + 1
+        end_line = node.end_point.row + 1
+        node_lines = lines[node.start_point.row : node.end_point.row + 1]
+        node_text = "".join(node_lines).rstrip()
+
+        tokens = _count_tokens(node_text)
+
+        if tokens <= chunk_size:
+            # Whole definition fits in one chunk
+            if node_text:
+                chunks.append(
+                    Chunk(
+                        file_path=file_path,
+                        start_line=start_line,
+                        end_line=end_line,
+                        content=node_text,
+                        language=language,
+                    )
+                )
+        else:
+            # Definition is too large. If it's a class with body methods, decompose it.
+            if target_node.type == "class_definition":
+                body_block = None
+                for child in target_node.children:
+                    if child.type == "block":
+                        body_block = child
+                        break
+
+                if body_block and body_block.children:
+                    # Collect class header (up to the first method)
+                    first_method = None
+                    for child in body_block.children:
+                        c_type = child.type
+                        if c_type == "decorated_definition":
+                            for sc in child.children:
+                                if sc.type == "function_definition":
+                                    first_method = child
+                                    break
+                            if first_method:
+                                break
+                        elif c_type == "function_definition":
+                            first_method = child
+                            break
+
+                    header_end_row = (first_method.start_point.row - 1) if first_method else body_block.start_point.row
+                    if header_end_row >= node.start_point.row:
+                        header_lines = lines[node.start_point.row : header_end_row + 1]
+                        header_text = "".join(header_lines).rstrip()
+                        if header_text:
+                            chunks.append(
+                                Chunk(
+                                    file_path=file_path,
+                                    start_line=start_line,
+                                    end_line=header_end_row + 1,
+                                    content=header_text,
+                                    language=language,
+                                )
+                            )
+
+                    # Now emit each method individually
+                    for child in body_block.children:
+                        c_type = child.type
+                        is_method = c_type == "function_definition" or (
+                            c_type == "decorated_definition"
+                            and any(sc.type == "function_definition" for sc in child.children)
+                        )
+                        if is_method:
+                            m_start = child.start_point.row + 1
+                            m_end = child.end_point.row + 1
+                            m_lines = lines[child.start_point.row : child.end_point.row + 1]
+                            m_text = "".join(m_lines).rstrip()
+                            if _count_tokens(m_text) <= chunk_size:
+                                chunks.append(
+                                    Chunk(
+                                        file_path=file_path,
+                                        start_line=m_start,
+                                        end_line=m_end,
+                                        content=m_text,
+                                        language=language,
+                                    )
+                                )
+                            else:
+                                chunks.extend(
+                                    _chunk_by_tokens(m_lines, file_path, language, chunk_size, overlap)
+                                )
+                    return
+
+            # For functions or classes without granular methods, fall back to sliding token window
+            chunks.extend(
+                _chunk_by_tokens(node_lines, file_path, language, chunk_size, overlap)
+            )
+
+    root = tree.root_node
+    for child in root.children:
+        process_node(child, is_top_level=True)
+
+    # Flush any remaining lines at the end of the file
+    flush_pending(len(lines))
+
+    # If AST produced no chunks for non-empty code, fall back to token chunking
+    if not chunks:
+        return _chunk_by_tokens(lines, file_path, language, chunk_size, overlap)
+
+    return chunks
+
+
 def chunk_file(
     file_path: str,
     content: str,
     chunk_size: int = DEFAULT_CHUNK_SIZE,
     overlap: int = DEFAULT_CHUNK_OVERLAP,
+    strategy: str | None = None,
 ) -> list[Chunk]:
     """Split a file's content into searchable chunks.
 
     Dispatches to the appropriate strategy:
     - Markdown files → heading-based splitting
-    - All other files → token-based overlapping window
+    - Code files with strategy='ast' (default) → syntax-tree aware chunking
+    - Code files with strategy='tokens' → sliding token window
 
     Args:
         file_path:  Relative path of the file in the repository.
         content:    Full text content of the file.
-        chunk_size: Maximum number of tokens per chunk (default: CHUNK_SIZE_TOKENS env var or 400).
-        overlap:    Overlap tokens between consecutive chunks (default: CHUNK_OVERLAP_TOKENS env var or 50).
+        chunk_size: Maximum number of tokens per chunk (default: CHUNK_SIZE_TOKENS env var or 200).
+        overlap:    Overlap tokens between consecutive chunks (default: CHUNK_OVERLAP_TOKENS env var or 40).
+        strategy:   'ast' for syntax-tree aware, 'tokens' for sliding window.
+                    Defaults to CHUNK_STRATEGY env var (or 'ast').
 
     Returns:
         List of Chunk objects. Returns an empty list for empty files.
@@ -269,6 +505,10 @@ def chunk_file(
     # Use a simple suffix check to avoid re-extracting the extension
     if file_path.endswith(".md"):
         return _chunk_markdown(content, file_path, chunk_size, overlap)
+
+    active_strategy = (strategy or DEFAULT_CHUNK_STRATEGY).lower()
+    if active_strategy == "ast":
+        return chunk_file_ast(file_path, content, language, chunk_size, overlap)
 
     lines = content.splitlines(keepends=True)
     return _chunk_by_tokens(lines, file_path, language, chunk_size, overlap)

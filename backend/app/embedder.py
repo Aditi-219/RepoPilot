@@ -14,8 +14,9 @@ import logging
 import os
 
 import torch
-from app.chunker import Chunk
 from transformers import AutoConfig, AutoTokenizer, BertModel
+
+from app.chunker import Chunk
 
 logger = logging.getLogger(__name__)
 

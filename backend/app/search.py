@@ -16,9 +16,10 @@ outperforms Condorcet and individual Rank Learning Methods"
 import logging
 from dataclasses import dataclass, field
 
-from app.embedder import embed_query
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+from app.embedder import embed_query
 
 logger = logging.getLogger(__name__)
 

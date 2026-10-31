@@ -10,9 +10,17 @@ This router provides endpoints for:
 
 import json
 import logging
+import os
 import uuid
 from collections.abc import AsyncIterator
 from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+from langgraph.errors import GraphRecursionError
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
 from app.agent.checkpoint import get_checkpointer
 from app.agent.graph import create_agent_graph
@@ -27,13 +35,11 @@ from app.schemas import (
     ChatSessionResponse,
     ChatStreamRequest,
 )
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import StreamingResponse
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
-from sqlalchemy import func, select
-from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
+
+# Default LangGraph execution recursion limit per turn (can be overridden via AGENT_RECURSION_LIMIT)
+DEFAULT_RECURSION_LIMIT: int = int(os.getenv("AGENT_RECURSION_LIMIT", "50"))
 
 router = APIRouter(
     prefix="/api/chat",
@@ -108,9 +114,7 @@ def list_sessions(
     """Retrieve all chat sessions for a repository, ordered by newest activity first."""
     get_repository_or_404(db, repository_id)
     statement = (
-        select(ChatSession)
-        .where(ChatSession.repository_id == repository_id)
-        .order_by(ChatSession.updated_at.desc())
+        select(ChatSession).where(ChatSession.repository_id == repository_id).order_by(ChatSession.updated_at.desc())
     )
     return list(db.scalars(statement).all())
 
@@ -220,9 +224,11 @@ async def stream_chat(
     checkpointer = get_checkpointer()
     graph = create_agent_graph(checkpointer=checkpointer)
 
+    recursion_limit = int(os.getenv("AGENT_RECURSION_LIMIT", str(DEFAULT_RECURSION_LIMIT)))
+
     config = {
         "configurable": {"thread_id": session_id},
-        "recursion_limit": 15,
+        "recursion_limit": recursion_limit,
         "run_name": f"repopilot-chat:{owner}/{repo_name}",
         "tags": ["repopilot", "chat", f"repo:{repo.full_name}", f"repo_id:{repository_id}"],
         "metadata": {
@@ -276,6 +282,19 @@ async def stream_chat(
             # Terminal completion event
             yield f"data: {json.dumps({'type': 'done'})}\n\n"
 
+        except GraphRecursionError as exc:
+            logger.warning(
+                "LangGraph recursion limit (%d) reached for session %s: %s",
+                recursion_limit,
+                session_id,
+                exc,
+            )
+            friendly_err = (
+                f"The agent reached its maximum step limit ({recursion_limit}) while exploring the repository. "
+                "You can increase AGENT_RECURSION_LIMIT in backend/.env, or ask a more specific question."
+            )
+            err_data = json.dumps({"type": "error", "error": friendly_err})
+            yield f"data: {err_data}\n\n"
         except Exception as exc:
             logger.exception("Error during chat stream for session %s: %s", session_id, exc)
             err_data = json.dumps({"type": "error", "error": str(exc)})

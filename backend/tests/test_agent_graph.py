@@ -3,9 +3,10 @@
 from unittest.mock import AsyncMock, patch
 
 import pytest
-from app.agent.graph import create_agent_graph
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langgraph.checkpoint.memory import MemorySaver
+
+from app.agent.graph import create_agent_graph
 
 
 class MockChatModel:
@@ -90,12 +91,14 @@ async def test_agent_graph_tool_call_loop():
         mock_fetch.return_value = mock_tree
 
         graph = create_agent_graph(model=model)
-        result = await graph.ainvoke({
-            "messages": [HumanMessage(content="List files in src")],
-            "repo_id": 1,
-            "repo_owner": "pallets",
-            "repo_name": "flask",
-        })
+        result = await graph.ainvoke(
+            {
+                "messages": [HumanMessage(content="List files in src")],
+                "repo_id": 1,
+                "repo_owner": "pallets",
+                "repo_name": "flask",
+            }
+        )
 
         assert mock_fetch.awaited
         # Verify the final message is the assistant's concluding response
@@ -107,10 +110,12 @@ async def test_agent_graph_tool_call_loop():
 @pytest.mark.asyncio
 async def test_agent_graph_durable_checkpoint_memory():
     """Verify multi-turn memory persistence using thread_id checkpointer."""
-    model = MockChatModel([
-        AIMessage(content="Your project uses FastAPI."),
-        AIMessage(content="Yes, you previously asked about FastAPI."),
-    ])
+    model = MockChatModel(
+        [
+            AIMessage(content="Your project uses FastAPI."),
+            AIMessage(content="Yes, you previously asked about FastAPI."),
+        ]
+    )
 
     checkpointer = MemorySaver()
     graph = create_agent_graph(model=model, checkpointer=checkpointer)
@@ -132,3 +137,90 @@ async def test_agent_graph_durable_checkpoint_memory():
     messages = res2["messages"]
     assert len(messages) == 4  # Human1, AI1, Human2, AI2
     assert messages[-1].content == "Yes, you previously asked about FastAPI."
+
+
+@pytest.mark.asyncio
+async def test_agent_graph_concludes_near_recursion_limit():
+    """Verify agent terminates gracefully with a summary when approaching recursion limit."""
+
+    class LoopingModel:
+        def __init__(self, with_tools: bool = False):
+            self.with_tools = with_tools
+            self.invocations = 0
+
+        def bind_tools(self, tools):
+            return LoopingModel(with_tools=True)
+
+        async def ainvoke(self, messages, config=None):
+            self.invocations += 1
+            # Check if concluding instruction was passed
+            for m in messages:
+                if "maximum tool exploration step limit" in str(getattr(m, "content", "")):
+                    return AIMessage(content="Final summary: gathered all available dependency details.")
+            if self.with_tools:
+                return AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "inspect_file_tree",
+                            "args": {"owner": "pallets", "repo": "flask", "prefix": "src"},
+                            "id": f"call_{self.invocations}",
+                        }
+                    ],
+                )
+            return AIMessage(content="Final response.")
+
+    with patch("app.tools.github_tools.fetch_repo_tree", new_callable=AsyncMock) as mock_fetch:
+        mock_fetch.return_value = [{"path": "src/app.py", "size": 100}]
+        model = LoopingModel(with_tools=False)
+        graph = create_agent_graph(model=model)
+
+        # Set a tight recursion limit of 6
+        result = await graph.ainvoke(
+            {
+                "messages": [HumanMessage(content="What dependencies are used?")],
+                "repo_id": 1,
+                "repo_owner": "pallets",
+                "repo_name": "flask",
+            },
+            config={"recursion_limit": 6},
+        )
+
+        assert mock_fetch.awaited
+        # Graph must finish cleanly without raising GraphRecursionError
+        assert "Final summary" in result["messages"][-1].content
+
+
+@pytest.mark.asyncio
+async def test_agent_graph_recovers_dangling_tool_calls():
+    """Verify that unfulfilled tool calls from an interrupted turn are resolved safely."""
+    model = MockChatModel([AIMessage(content="Recovered and answered.")])
+    graph = create_agent_graph(model=model)
+
+    # State containing a dangling AIMessage with a tool_call and no ToolMessage response
+    dangling_tool_call = AIMessage(
+        content="",
+        tool_calls=[
+            {
+                "name": "inspect_file_tree",
+                "args": {"owner": "pallets", "repo": "flask"},
+                "id": "interrupted_call_1",
+            }
+        ],
+    )
+    initial_state = {
+        "messages": [
+            HumanMessage(content="Previous prompt"),
+            dangling_tool_call,
+        ],
+        "repo_id": 1,
+        "repo_owner": "pallets",
+        "repo_name": "flask",
+    }
+
+    result = await graph.ainvoke(initial_state)
+    assert result["messages"][-1].content == "Recovered and answered."
+    # Check that model received a ToolMessage resolving the interrupted call
+    recorded = model.recorded_messages[0]
+    has_resolved_tool_msg = any(getattr(m, "tool_call_id", None) == "interrupted_call_1" for m in recorded)
+    assert has_resolved_tool_msg

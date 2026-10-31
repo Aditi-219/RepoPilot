@@ -7,17 +7,18 @@ routing edges for codebase intelligence interactions.
 import os
 from typing import Any
 
-from app.agent.prompts import SYSTEM_PROMPT
-from app.agent.state import AgentState
-from app.tools.github_tools import fetch_repo_metadata, inspect_file_tree, read_source_file
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import AIMessage, SystemMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
+
+from app.agent.prompts import SYSTEM_PROMPT
+from app.agent.state import AgentState
+from app.tools.github_tools import fetch_repo_metadata, inspect_file_tree, read_source_file
 
 # Default toolset available to the agent
 AGENT_TOOLS = [
@@ -42,8 +43,7 @@ def get_default_model(model_name: str | None = None) -> BaseChatModel:
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError(
-            "GEMINI_API_KEY is not configured in backend/.env. "
-            "Please provide a valid Google AI API key."
+            "GEMINI_API_KEY is not configured in backend/.env. Please provide a valid Google AI API key."
         )
 
     resolved_model = model_name or os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
@@ -108,7 +108,45 @@ def create_agent_graph(
             full_system_prompt = SYSTEM_PROMPT + context_header
             messages = [SystemMessage(content=full_system_prompt), *messages]
 
-        response = await model_with_tools.ainvoke(messages, config)
+        # Defensive check: if the previous turn was interrupted leaving an unfulfilled tool_call,
+        # inject placeholder tool responses so the LLM doesn't reject malformed message sequences.
+        if messages and isinstance(messages[-1], AIMessage):
+            last_ai = messages[-1]
+            if getattr(last_ai, "tool_calls", None):
+                for tc in last_ai.tool_calls:
+                    tc_id = tc.get("id") or "call_recovered"
+                    tc_name = tc.get("name", "unknown_tool")
+                    messages.append(
+                        ToolMessage(
+                            content=f"Tool call '{tc_name}' was interrupted or cancelled.",
+                            tool_call_id=tc_id,
+                        )
+                    )
+
+        # Inspect current recursion step budget
+        runnable_config = config or {}
+        step = runnable_config.get("metadata", {}).get("langgraph_step", 1)
+        limit = runnable_config.get("recursion_limit")
+
+        # When within 2 steps of the limit, conclude without tools to route to END gracefully
+        if limit is not None and step >= limit - 2:
+            conclude_instruction = SystemMessage(
+                content=(
+                    "You have reached the maximum tool exploration step limit for this query. "
+                    "Do NOT attempt to call any more tools. Summarize your findings based strictly "
+                    "on the information gathered so far and present your answer to the user now."
+                )
+            )
+            response = await active_model.ainvoke([*messages, conclude_instruction], config)
+            # Ensure no pending tool calls remain on this response
+            if hasattr(response, "tool_calls") and response.tool_calls:
+                response = AIMessage(
+                    content=response.content or "Reached exploration step limit. Summary of findings provided above.",
+                    id=getattr(response, "id", None),
+                )
+        else:
+            response = await model_with_tools.ainvoke(messages, config)
+
         return {"messages": [response]}
 
     workflow = StateGraph(AgentState)

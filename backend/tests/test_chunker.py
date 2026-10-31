@@ -63,3 +63,56 @@ def test_chunk_markdown_splits_on_headings():
     assert len(chunks) >= 1
     assert any("Installation" in c.content for c in chunks)
     assert any("Usage" in c.content for c in chunks)
+
+
+def test_chunk_file_ast_separates_functions_and_classes():
+    """AST-aware chunker should separate discrete functions into distinct chunks."""
+    code = (
+        "import math\n\n"
+        "def compute_area(radius: float) -> float:\n"
+        "    \"\"\"Calculate circle area.\"\"\"\n"
+        "    return math.pi * radius ** 2\n\n"
+        "def compute_perimeter(radius: float) -> float:\n"
+        "    \"\"\"Calculate circle perimeter.\"\"\"\n"
+        "    return 2 * math.pi * radius\n"
+    )
+    chunks = chunk_file("geometry.py", code, chunk_size=50, strategy="ast")
+    # Preamble (import math), compute_area, and compute_perimeter
+    assert len(chunks) >= 2
+    func_names = [c.content for c in chunks]
+    assert any("compute_area" in fn for fn in func_names)
+    assert any("compute_perimeter" in fn for fn in func_names)
+    for c in chunks:
+        assert c.file_path == "geometry.py"
+        assert c.language == "python"
+        assert c.start_line <= c.end_line
+
+
+def test_chunk_file_ast_decomposes_large_class():
+    """A large class exceeding chunk_size should be decomposed into methods."""
+    code = (
+        "class ServiceManager:\n"
+        "    \"\"\"Manages background services.\"\"\"\n"
+        "    def __init__(self):\n"
+        "        self.active = True\n\n"
+        "    def start_worker(self):\n"
+        "        # Long worker setup\n"
+        "        return 'started'\n\n"
+        "    def stop_worker(self):\n"
+        "        # Long worker teardown\n"
+        "        return 'stopped'\n"
+    )
+    # Using small chunk_size to trigger decomposition
+    chunks = chunk_file("service.py", code, chunk_size=25, strategy="ast")
+    assert len(chunks) >= 2
+    contents = [c.content for c in chunks]
+    assert any("start_worker" in ct for ct in contents)
+    assert any("stop_worker" in ct for ct in contents)
+
+
+def test_chunk_file_strategy_tokens_flag():
+    """Explicit strategy='tokens' forces sliding window chunking."""
+    code = "def sample():\n    return 42\n"
+    chunks = chunk_file("sample.py", code, strategy="tokens")
+    assert len(chunks) == 1
+    assert "sample" in chunks[0].content

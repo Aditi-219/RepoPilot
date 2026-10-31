@@ -8,14 +8,15 @@ This module provides endpoints for:
 
 import logging
 
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
+
 from app.database import get_db
 from app.indexer import index_repository
 from app.models import CodeChunk
 from app.routers.helpers import get_repository_or_404
 from app.schemas import ChunkCountResponse, ChunkResponse, IndexResponse
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
-from sqlalchemy import func, select
-from sqlalchemy.orm import Session
 
 logger = logging.getLogger(__name__)
 
