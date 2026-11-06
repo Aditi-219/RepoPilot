@@ -146,7 +146,6 @@ def test_get_session_history_with_checkpointed_messages(client):
 
 def test_get_session_history_filters_intermediate_tools_and_thinking(client):
     """Verify that history endpoint strips out intermediate tool calls, tool results, and thinking."""
-    from langchain_core.messages import ToolMessage
     from app.database import SessionLocal
 
     with SessionLocal() as db:
