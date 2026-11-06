@@ -62,6 +62,23 @@ def _extract_text_content(content: Any) -> str:
     return str(content) if content is not None else ""
 
 
+def _is_meaningful_content(content: str) -> bool:
+    """Check if content represents an actual user or assistant message.
+
+    Discards empty strings, internal 'thinking' text placeholders,
+    and raw tool execution output status strings.
+    """
+    stripped = content.strip()
+    if not stripped:
+        return False
+    lower = stripped.lower()
+    if lower in ("thinking", "*thinking*", "thinking…", "thinking..."):
+        return False
+    if lower.startswith("tool execution output received"):
+        return False
+    return True
+
+
 def _get_session_or_404(db: Session, session_id: str) -> ChatSession:
     """Fetch a chat session by ID or raise HTTP 404."""
     session = db.get(ChatSession, session_id)
@@ -140,37 +157,53 @@ async def get_session_history(
     raw_messages = state.values.get("messages", []) if state else []
 
     formatted_messages: list[ChatMessageItem] = []
+
+    # Process turn by turn:
+    # A conversation consists of turns starting with HumanMessage.
+    # For each turn, preserve the user question and strictly the final meaningful AIMessage.
+    # ToolMessage and intermediate thinking/tool-call steps are filtered out.
+    current_human: ChatMessageItem | None = None
+    current_final_ai: ChatMessageItem | None = None
+
     for msg in raw_messages:
-        # Filter out system messages from client display
-        if isinstance(msg, SystemMessage):
+        # Exclude system instructions and raw tool execution dumps
+        if isinstance(msg, (SystemMessage, ToolMessage)):
             continue
 
         if isinstance(msg, HumanMessage):
-            formatted_messages.append(
-                ChatMessageItem(
+            # If a previous turn was completed, flush it to the list
+            if current_human is not None:
+                formatted_messages.append(current_human)
+                if current_final_ai is not None:
+                    formatted_messages.append(current_final_ai)
+                current_human = None
+                current_final_ai = None
+
+            content = _extract_text_content(msg.content)
+            if _is_meaningful_content(content):
+                current_human = ChatMessageItem(
                     id=getattr(msg, "id", None),
                     role="user",
-                    content=_extract_text_content(msg.content),
+                    content=content,
                 )
-            )
+
         elif isinstance(msg, AIMessage):
-            tool_calls = getattr(msg, "tool_calls", None) or None
-            formatted_messages.append(
-                ChatMessageItem(
+            content = _extract_text_content(msg.content)
+            # If the AIMessage contains actual response text, record it as candidate final response
+            if _is_meaningful_content(content):
+                current_final_ai = ChatMessageItem(
                     id=getattr(msg, "id", None),
                     role="assistant",
-                    content=_extract_text_content(msg.content),
-                    tool_calls=tool_calls,
+                    content=content,
                 )
-            )
-        elif isinstance(msg, ToolMessage):
-            formatted_messages.append(
-                ChatMessageItem(
-                    id=getattr(msg, "id", None),
-                    role="tool",
-                    content=_extract_text_content(msg.content),
-                )
-            )
+
+    # Flush any remaining turn at the end of the history
+    if current_human is not None:
+        formatted_messages.append(current_human)
+        if current_final_ai is not None:
+            formatted_messages.append(current_final_ai)
+    elif current_final_ai is not None:
+        formatted_messages.append(current_final_ai)
 
     return ChatHistoryResponse(
         session_id=session.id,

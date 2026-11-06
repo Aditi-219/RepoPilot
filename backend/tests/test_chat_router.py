@@ -144,6 +144,75 @@ def test_get_session_history_with_checkpointed_messages(client):
     set_checkpointer(None)
 
 
+def test_get_session_history_filters_intermediate_tools_and_thinking(client):
+    """Verify that history endpoint strips out intermediate tool calls, tool results, and thinking."""
+    from langchain_core.messages import ToolMessage
+    from app.database import SessionLocal
+
+    with SessionLocal() as db:
+        repo = db.query(Repository).filter_by(full_name="test/repo").first()
+        repo_id = repo.id
+
+    create_res = client.post(f"/api/chat/{repo_id}/sessions")
+    assert create_res.status_code == 201
+    session_id = create_res.json()["id"]
+
+    mem_checkpointer = MemorySaver()
+    set_checkpointer(mem_checkpointer)
+
+    from app.agent.graph import create_agent_graph
+
+    # Model that produces tool calls on first step, then final answer
+    class MultiStepModel:
+        def __init__(self):
+            self.step = 0
+
+        def bind_tools(self, tools):
+            return self
+
+        async def ainvoke(self, messages, config=None):
+            self.step += 1
+            if self.step == 1:
+                return AIMessage(
+                    content="",
+                    tool_calls=[{"name": "inspect_file_tree", "args": {}, "id": "call_1"}],
+                )
+            return AIMessage(
+                content="The architecture of Tiny Music Player is designed around a lightweight service pattern."
+            )
+
+    graph = create_agent_graph(model=MultiStepModel(), checkpointer=mem_checkpointer)
+
+    import asyncio
+
+    asyncio.run(
+        graph.ainvoke(
+            {"messages": [HumanMessage(content="Inspect the project file structure and give me an architectural overview.")]},
+            config={"configurable": {"thread_id": session_id}},
+        )
+    )
+
+    # Fetch history via API
+    hist_res = client.get(f"/api/chat/sessions/{session_id}/history")
+    assert hist_res.status_code == 200
+    messages = hist_res.json()["messages"]
+
+    # Must only contain the user question and the final assistant answer
+    assert len(messages) == 2
+    assert messages[0]["role"] == "user"
+    assert messages[0]["content"] == "Inspect the project file structure and give me an architectural overview."
+    assert messages[1]["role"] == "assistant"
+    assert messages[1]["content"] == "The architecture of Tiny Music Player is designed around a lightweight service pattern."
+
+    # Verify no tool messages or empty thinking placeholders leaked
+    assert all(m["role"] in ("user", "assistant") for m in messages)
+    assert not any("Tool execution" in m["content"] for m in messages)
+    assert not any(m["content"].lower() == "thinking" for m in messages)
+
+    client.delete(f"/api/chat/sessions/{session_id}")
+    set_checkpointer(None)
+
+
 def test_stream_chat_sse_endpoint(client):
     """Test SSE streaming response from the chat streaming endpoint."""
     from unittest.mock import patch
