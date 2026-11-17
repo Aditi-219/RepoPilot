@@ -1,0 +1,676 @@
+{
+  "ceiling_analysis": {
+    "candidate_pool_depth": 50,
+    "pool_hit_rate": 1.0,
+    "missing_queries_count": 0,
+    "missing_queries": []
+  },
+  "lift_comparison": {
+    "macro_averages": {
+      "off": {
+        "Hit@1": 0.2778,
+        "Hit@3": 0.6111,
+        "Hit@5": 0.6667,
+        "MRR": 0.4463,
+        "nDCG@5": 0.6868
+      },
+      "heuristic": {
+        "Hit@1": 0.2778,
+        "Hit@3": 0.6111,
+        "Hit@5": 0.6667,
+        "MRR": 0.4463,
+        "nDCG@5": 0.6868
+      },
+      "neural": {
+        "Hit@1": 0.3889,
+        "Hit@3": 0.7222,
+        "Hit@5": 0.7778,
+        "MRR": 0.5417,
+        "nDCG@5": 0.7116
+      }
+    },
+    "win_loss_tie_mrr": {
+      "heuristic_vs_off": {
+        "improved": 0,
+        "regressed": 0,
+        "tied": 18
+      },
+      "neural_vs_heuristic": {
+        "improved": 6,
+        "regressed": 6,
+        "tied": 6
+      }
+    }
+  },
+  "cost_latencies": {
+    "off": {
+      "p50_ms": 0.0,
+      "p95_ms": 0.06,
+      "mean_ms": 0.01
+    },
+    "heuristic": {
+      "p50_ms": 0.04,
+      "p95_ms": 0.43,
+      "mean_ms": 0.07
+    },
+    "neural": {
+      "p50_ms": 2446.55,
+      "p95_ms": 2894.29,
+      "mean_ms": 2460.52
+    }
+  },
+  "query_details": [
+    {
+      "id": "rp-001",
+      "category": "locate",
+      "question": "Where is Reciprocal Rank Fusion (RRF) implemented to combine semantic and keyword search rankings?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.5
+        },
+        "heuristic": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.5
+        },
+        "neural": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.4306765580733931
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 5011.94,
+        "heuristic": 0.12,
+        "neural": 2793.97
+      }
+    },
+    {
+      "id": "rp-002",
+      "category": "locate",
+      "question": "Where is the neural cross-encoder model loaded and invoked for candidate reranking?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.9306765580733931
+        },
+        "heuristic": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.9306765580733931
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 1.1309297535714575
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3946.86,
+        "heuristic": 0.07,
+        "neural": 2375.36
+      }
+    },
+    {
+      "id": "rp-003",
+      "category": "locate",
+      "question": "Where are the HNSW vector cosine distance index and full-text search GIN index created in the database?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3663.11,
+        "heuristic": 0.03,
+        "neural": 2534.75
+      }
+    },
+    {
+      "id": "rp-004",
+      "category": "locate",
+      "question": "Where is Tree-sitter AST parsing configured to extract classes, functions, and methods for chunking?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 0.6309297535714575
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 0.6309297535714575
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.3333333333333333,
+          "nDCG@5": 0.5
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3938.59,
+        "heuristic": 0.04,
+        "neural": 2894.29
+      }
+    },
+    {
+      "id": "rp-005",
+      "category": "locate",
+      "question": "Where is the Server-Sent Events (SSE) streaming chat endpoint implemented?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.0
+        },
+        "heuristic": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.0
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 1.0,
+          "MRR": 0.25,
+          "nDCG@5": 0.43067655807339306
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 4509.49,
+        "heuristic": 0.43,
+        "neural": 2511.39
+      }
+    },
+    {
+      "id": "rp-006",
+      "category": "explain",
+      "question": "How does repository ingestion work from fetching the file tree to inserting embedded chunks?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "neural": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.0
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 4299.77,
+        "heuristic": 0.06,
+        "neural": 2525.06
+      }
+    },
+    {
+      "id": "rp-007",
+      "category": "explain",
+      "question": "How does the hybrid search function combine dense vector search with sparse full-text search?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3567.82,
+        "heuristic": 0.03,
+        "neural": 2471.21
+      }
+    },
+    {
+      "id": "rp-008",
+      "category": "explain",
+      "question": "How does the LangGraph agent prevent infinite tool execution loops?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 1.0,
+          "MRR": 0.2,
+          "nDCG@5": 0.38685280723454163
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 1.0,
+          "MRR": 0.2,
+          "nDCG@5": 0.38685280723454163
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3595.04,
+        "heuristic": 0.03,
+        "neural": 2314.81
+      }
+    },
+    {
+      "id": "rp-009",
+      "category": "explain",
+      "question": "How does RepoPilot decide whether to use local Ollama or cloud Gemini for RAG answer generation?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.5
+        },
+        "heuristic": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.5
+        },
+        "neural": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.3868528072345416
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3872.46,
+        "heuristic": 0.03,
+        "neural": 2297.36
+      }
+    },
+    {
+      "id": "rp-010",
+      "category": "explain",
+      "question": "How are Markdown files chunked differently from regular source code files?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 1.5177825608059992
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 1.5177825608059992
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.3333333333333333,
+          "nDCG@5": 1.3175293653079347
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3698.55,
+        "heuristic": 0.03,
+        "neural": 2295.66
+      }
+    },
+    {
+      "id": "rp-011",
+      "category": "cross-file",
+      "question": "Which function generates dense vector embeddings, what model is used, and which SQLAlchemy model stores them in PostgreSQL?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 0.38685280723454163
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 4093.97,
+        "heuristic": 0.03,
+        "neural": 2464.48
+      }
+    },
+    {
+      "id": "rp-012",
+      "category": "cross-file",
+      "question": "How does the codebase Q&A endpoint retrieve snippets and generate a grounded response?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 0.3973220069685352
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 0.3973220069685352
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.3333333333333333,
+          "nDCG@5": 0.19519002499605084
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3829.72,
+        "heuristic": 0.02,
+        "neural": 2270.07
+      }
+    },
+    {
+      "id": "rp-013",
+      "category": "cross-file",
+      "question": "Which agent tool reads source files, and which GitHub service function retrieves and decodes the file content?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 0.9197207891481876
+        },
+        "heuristic": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 0.9197207891481876
+        },
+        "neural": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.0
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 4042.74,
+        "heuristic": 0.03,
+        "neural": 2583.96
+      }
+    },
+    {
+      "id": "rp-014",
+      "category": "cross-file",
+      "question": "Where is durable conversation checkpointing initialized and bound to the LangGraph execution in FastAPI?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "neural": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 0.46927872602275644
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 4401.72,
+        "heuristic": 0.14,
+        "neural": 2510.76
+      }
+    },
+    {
+      "id": "rp-015",
+      "category": "debug",
+      "question": "Why might a repository file be excluded or skipped during the indexing file tree traversal?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 0.0,
+          "Hit@5": 0.0,
+          "MRR": 0.0,
+          "nDCG@5": 0.0
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3918.95,
+        "heuristic": 0.03,
+        "neural": 2283.57
+      }
+    },
+    {
+      "id": "rp-016",
+      "category": "debug",
+      "question": "Why would a user receive an HTTP 400 error when attempting to search or ask questions about a repository?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 0.6309297535714575
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 0.6309297535714575
+        },
+        "neural": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.5
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 4318.16,
+        "heuristic": 0.05,
+        "neural": 2411.65
+      }
+    },
+    {
+      "id": "rp-017",
+      "category": "debug",
+      "question": "How does the agent node handle an interrupted turn where the model previously emitted a tool call that was never answered?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.3333333333333333,
+          "nDCG@5": 0.9306765580733931
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.3333333333333333,
+          "nDCG@5": 0.9306765580733931
+        },
+        "neural": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 1.0616063116448506
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 3638.01,
+        "heuristic": 0.05,
+        "neural": 2322.46
+      }
+    },
+    {
+      "id": "rp-018",
+      "category": "debug",
+      "question": "What fallback occurs if Tree-sitter fails to initialize or parse a source code file during AST chunking?",
+      "hit_at_pool": 1.0,
+      "metrics": {
+        "off": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 1.0177825608059992
+        },
+        "heuristic": {
+          "Hit@1": 0.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 0.5,
+          "nDCG@5": 1.0177825608059992
+        },
+        "neural": {
+          "Hit@1": 1.0,
+          "Hit@3": 1.0,
+          "Hit@5": 1.0,
+          "MRR": 1.0,
+          "nDCG@5": 1.0
+        }
+      },
+      "latencies_ms": {
+        "retrieval": 4392.25,
+        "heuristic": 0.05,
+        "neural": 2428.62
+      }
+    }
+  ]
+}

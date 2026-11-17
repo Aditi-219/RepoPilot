@@ -1,0 +1,568 @@
+{
+  "timestamp": "2026-11-17 17:35:36",
+  "corpus": "code",
+  "judge_model": "gemini-3.1-flash-lite",
+  "sample_count": 6,
+  "mean_contextual_recall": 0.7083,
+  "mean_contextual_precision": 0.4822,
+  "mean_contextual_relevancy": 0.5833,
+  "per_query_results": [
+    {
+      "id": "rp-001",
+      "category": "locate",
+      "question": "Where is Reciprocal Rank Fusion (RRF) implemented to combine semantic and keyword search rankings?",
+      "ideal_answer": "Reciprocal Rank Fusion is implemented in the _rrf_fusion function in backend/app/search.py using the constant RRF_K = 60.",
+      "top_retrieved_files": [
+        "backend/app/search.py:L1-L23",
+        "backend/app/search.py:L1-L20",
+        "backend/app/search.py:L81-L104",
+        "backend/app/schemas.py:L105-L126",
+        "backend/tests/test_search.py:L9-L14"
+      ],
+      "contextual_recall": {
+        "score": 1.0,
+        "details": {
+          "statements": [
+            {
+              "statement": "Reciprocal Rank Fusion is implemented in the _rrf_fusion function in backend/app/search.py.",
+              "attributed": true,
+              "reason": "Chunk 1 explicitly defines the _rrf_fusion function within backend/app/search.py."
+            },
+            {
+              "statement": "The implementation uses the constant RRF_K = 60.",
+              "attributed": true,
+              "reason": "Chunk 1 shows the function signature uses RRF_K as the default value for k, and Chunk 5 confirms the usage of 60 in a test context, while the code structure implies RRF_K is the defined constant."
+            }
+          ],
+          "recall_score": 1.0,
+          "explanation": "The retrieved context confirms both the location of the function and the constant value used for the RRF implementation."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_precision": {
+        "score": 1.0,
+        "relevant_nodes": 3,
+        "total_nodes": 5,
+        "details": {
+          "verdicts": [
+            {
+              "rank": 1,
+              "relevant": true,
+              "reason": "The node explicitly defines the _rrf_fusion function in backend/app/search.py, which is the implementation of the RRF algorithm."
+            },
+            {
+              "rank": 2,
+              "relevant": true,
+              "reason": "The node confirms that the hybrid retrieval engine, which uses RRF, is located in backend/app/search.py."
+            },
+            {
+              "rank": 3,
+              "relevant": true,
+              "reason": "The node shows the specific usage of the _rrf_fusion function within the search pipeline in backend/app/search.py."
+            },
+            {
+              "rank": 4,
+              "relevant": false,
+              "reason": "This node describes the search schema and mentions RRF conceptually, but does not provide the implementation details or location of the logic."
+            },
+            {
+              "rank": 5,
+              "relevant": false,
+              "reason": "This node is a test file, which demonstrates usage but is not the implementation location of the RRF logic."
+            }
+          ],
+          "explanation": "The implementation of Reciprocal Rank Fusion is located in 'backend/app/search.py', specifically within the '_rrf_fusion' function. Nodes 1, 2, and 3 provide direct evidence of this implementation and its integration within the search pipeline in that file."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_relevancy": {
+        "score": 1.0,
+        "details": {
+          "relevancy_score": 1.0,
+          "relevant_points": [
+            "Chunk 1 explicitly identifies the implementation file as 'backend/app/search.py' and provides the function definition '_rrf_fusion'.",
+            "Chunk 3 shows the specific usage of '_rrf_fusion' within the search pipeline in 'backend/app/search.py'.",
+            "Chunk 2 confirms the hybrid retrieval engine architecture is located in 'backend/app/search.py'."
+          ],
+          "irrelevant_points": [],
+          "explanation": "The retrieved context provides the exact file path ('backend/app/search.py') and the specific function implementation ('_rrf_fusion') used to combine semantic and keyword search rankings. All chunks are highly relevant as they either define, document, or demonstrate the implementation of RRF within the codebase."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "evaluation_time_seconds": 5.57
+    },
+    {
+      "id": "rp-004",
+      "category": "locate",
+      "question": "Where is Tree-sitter AST parsing configured to extract classes, functions, and methods for chunking?",
+      "ideal_answer": "Tree-sitter parser loading and AST-based syntax splitting are implemented in _get_tree_sitter_parser and chunk_file_ast in backend/app/chunker.py.",
+      "top_retrieved_files": [
+        "backend/app/chunker.py:L1-L26",
+        "backend/tests/test_chunker.py:L1-L17",
+        "backend/app/chunker.py:L20-L43",
+        "backend/tests/test_chunker.py:L1-L20",
+        "backend/app/chunker.py:L20-L40"
+      ],
+      "contextual_recall": {
+        "score": 1.0,
+        "details": {
+          "statements": [
+            {
+              "statement": "Tree-sitter parser loading is implemented in _get_tree_sitter_parser in backend/app/chunker.py.",
+              "attributed": true,
+              "reason": "Chunk 1 and Chunk 3 show the function _get_tree_sitter_parser being called within backend/app/chunker.py."
+            },
+            {
+              "statement": "AST-based syntax splitting is implemented in chunk_file_ast in backend/app/chunker.py.",
+              "attributed": true,
+              "reason": "Chunk 1 explicitly defines chunk_file_ast in backend/app/chunker.py and describes its purpose as splitting source code into AST-aware chunks."
+            }
+          ],
+          "recall_score": 1.0,
+          "explanation": "The retrieved context confirms both the function names and their location in the specified file, as well as their roles in Tree-sitter parsing and AST-based chunking."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_precision": {
+        "score": 0.2,
+        "relevant_nodes": 1,
+        "total_nodes": 5,
+        "details": {
+          "verdicts": [
+            {
+              "rank": 1,
+              "relevant": false,
+              "reason": "The node shows the function signature and docstring but does not contain the configuration logic for Tree-sitter AST parsing."
+            },
+            {
+              "rank": 2,
+              "relevant": false,
+              "reason": "This is a test file and does not contain the implementation or configuration logic for the AST parser."
+            },
+            {
+              "rank": 3,
+              "relevant": false,
+              "reason": "This node shows the execution flow of the parser but does not show where the parsing logic or configuration is defined."
+            },
+            {
+              "rank": 4,
+              "relevant": false,
+              "reason": "This is a test file and does not contain the implementation or configuration logic for the AST parser."
+            },
+            {
+              "rank": 5,
+              "relevant": true,
+              "reason": "This node identifies the strategy selection logic and mentions the DEFAULT_CHUNK_STRATEGY environment variable, which is relevant to how the AST parsing is configured."
+            }
+          ],
+          "explanation": "The retrieved nodes primarily consist of function signatures, test cases, and execution flow logic. Node 5 is the only one that touches upon the configuration aspect by referencing the strategy selection and the environment variable used to control the chunking strategy."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_relevancy": {
+        "score": 0.4,
+        "details": {
+          "relevancy_score": 0.4,
+          "relevant_points": [
+            "Chunk 1 and Chunk 3 identify that _get_tree_sitter_parser(language) is the function responsible for initializing the parser.",
+            "The context confirms that the logic for AST-aware chunking resides in backend/app/chunker.py."
+          ],
+          "irrelevant_points": [
+            "Chunk 2 and Chunk 4 are unit tests that demonstrate the behavior of the chunker but do not explain the configuration or implementation details of the AST extraction.",
+            "Chunk 5 discusses strategy selection logic but does not provide the specific configuration or query logic used by Tree-sitter to extract classes and methods."
+          ],
+          "explanation": "The retrieved context identifies the entry point for AST parsing (_get_tree_sitter_parser) within backend/app/chunker.py, but it fails to provide the actual configuration or the specific Tree-sitter query patterns used to extract classes, functions, and methods. Much of the provided context consists of unit tests and high-level function signatures that do not answer the 'where' or 'how' of the configuration."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "evaluation_time_seconds": 6.33
+    },
+    {
+      "id": "rp-006",
+      "category": "explain",
+      "question": "How does repository ingestion work from fetching the file tree to inserting embedded chunks?",
+      "ideal_answer": "In index_repository (backend/app/indexer.py), the repo status is set to indexing, previous chunks are cleared, the file tree is retrieved via fetch_repo_tree, files are downloaded concurrently, split into chunks using chunk_file, batched into embeddings via asyncio.to_thread(embed_chunks), persisted as CodeChunk rows in PostgreSQL, and marked as completed.",
+      "top_retrieved_files": [
+        "backend/app/indexer.py:L1-L22",
+        "backend/app/indexer.py:L20-L29",
+        "backend/app/indexer.py:L36-L63",
+        "backend/app/indexer.py:L21-L39",
+        "backend/app/github_service.py:L1-L24"
+      ],
+      "contextual_recall": {
+        "score": 1.0,
+        "details": {
+          "statements": [
+            {
+              "statement": "In index_repository (backend/app/indexer.py), the repo status is set to indexing.",
+              "attributed": true,
+              "reason": "Chunk 1 confirms the pipeline marks the status as 'indexing'."
+            },
+            {
+              "statement": "Previous chunks are cleared.",
+              "attributed": true,
+              "reason": "Chunk 4 explicitly shows the code deleting existing CodeChunk rows for the repository."
+            },
+            {
+              "statement": "The file tree is retrieved via fetch_repo_tree.",
+              "attributed": true,
+              "reason": "Chunk 4 confirms the use of fetch_repo_tree to get file entries."
+            },
+            {
+              "statement": "Files are downloaded concurrently.",
+              "attributed": true,
+              "reason": "Chunk 1 and Chunk 4 mention fetching files concurrently."
+            },
+            {
+              "statement": "Files are split into chunks using chunk_file.",
+              "attributed": true,
+              "reason": "Chunk 1 mentions chunking files and the imports in Chunk 1 show chunk_file is used."
+            },
+            {
+              "statement": "Chunks are batched into embeddings via asyncio.to_thread(embed_chunks).",
+              "attributed": true,
+              "reason": "Chunk 3 explicitly shows the use of asyncio.to_thread(embed_chunks, pending_chunks)."
+            },
+            {
+              "statement": "Chunks are persisted as CodeChunk rows in PostgreSQL.",
+              "attributed": true,
+              "reason": "Chunk 1 and Chunk 3 confirm bulk-inserting CodeChunk rows into PostgreSQL."
+            },
+            {
+              "statement": "The repository is marked as completed.",
+              "attributed": true,
+              "reason": "Chunk 1 confirms the final step is marking the status as 'completed'."
+            }
+          ],
+          "recall_score": 1.0,
+          "explanation": "All factual statements in the ideal answer are directly supported by the provided code snippets in the retrieved context."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_precision": {
+        "score": 0.8056,
+        "relevant_nodes": 3,
+        "total_nodes": 5,
+        "details": {
+          "verdicts": [
+            {
+              "rank": 1,
+              "relevant": true,
+              "reason": "Provides a high-level overview of the entire ingestion pipeline, directly answering the question by outlining the steps from fetching the file tree to inserting chunks."
+            },
+            {
+              "rank": 2,
+              "relevant": false,
+              "reason": "Contains only imports and configuration constants (batch size, concurrency) without explaining the actual ingestion process."
+            },
+            {
+              "rank": 3,
+              "relevant": true,
+              "reason": "Details the implementation of the embedding and database insertion steps, which are critical parts of the ingestion process."
+            },
+            {
+              "rank": 4,
+              "relevant": true,
+              "reason": "Explains the initial steps of the ingestion process, specifically clearing old data, parsing the URL, and fetching the file tree."
+            },
+            {
+              "rank": 5,
+              "relevant": false,
+              "reason": "Describes the GitHub service layer but does not explain the orchestration or the ingestion pipeline workflow requested."
+            }
+          ],
+          "explanation": "The retrieved nodes collectively provide a comprehensive view of the repository ingestion pipeline. Node 1 provides the high-level summary, while Nodes 3 and 4 provide the specific implementation details for the steps involved in fetching, chunking, embedding, and inserting data into the database."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_relevancy": {
+        "score": 0.95,
+        "details": {
+          "relevancy_score": 0.95,
+          "relevant_points": [
+            "Chunk 1 provides a high-level overview of the 8-step ingestion pipeline.",
+            "Chunk 4 details the initial steps: clearing old chunks, parsing the URL, and fetching the file tree.",
+            "Chunk 3 explains the processing loop: concurrent fetching, chunking, batch embedding via thread pool, and database insertion.",
+            "Chunk 5 confirms the role of the github_service in fetching the file tree and file content."
+          ],
+          "irrelevant_points": [
+            "Chunk 2 contains configuration constants (BATCH_SIZE, _DOWNLOAD_CONCURRENCY) which are helpful but slightly redundant compared to the logic in other chunks.",
+            "The list of supported extensions in Chunk 5 is peripheral to the process flow requested."
+          ],
+          "explanation": "The retrieved context provides a comprehensive and accurate step-by-step breakdown of the repository ingestion process, covering everything from the initial file tree fetch to the final database insertion of embedded chunks. The information is highly relevant and directly answers the user's question."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "evaluation_time_seconds": 6.66
+    },
+    {
+      "id": "rp-008",
+      "category": "explain",
+      "question": "How does the LangGraph agent prevent infinite tool execution loops?",
+      "ideal_answer": "In agent_node in backend/app/agent/graph.py, the agent checks the current recursion step against recursion_limit. When within two steps of the limit, it injects a directive instructing the model not to call any more tools and to summarize its current findings immediately.",
+      "top_retrieved_files": [
+        "backend/app/agent/graph.py:L1-L19",
+        "backend/app/agent/graph.py:L18-L36",
+        "backend/app/tools/github_tools.py:L1-L14",
+        "backend/tests/test_agent_graph.py:L1-L23",
+        "backend/app/agent/graph.py:L1-L21"
+      ],
+      "contextual_recall": {
+        "score": 0.0,
+        "details": {
+          "statements": [
+            {
+              "statement": "In agent_node in backend/app/agent/graph.py, the agent checks the current recursion step against recursion_limit.",
+              "attributed": false,
+              "reason": "The provided context contains the definition of agent_node but does not show any logic checking recursion_limit or recursion steps."
+            },
+            {
+              "statement": "When within two steps of the limit, it injects a directive instructing the model not to call any more tools and to summarize its current findings immediately.",
+              "attributed": false,
+              "reason": "There is no mention of a 'two steps' threshold or an instruction injection mechanism to prevent tool loops in the provided context."
+            }
+          ],
+          "recall_score": 0.0,
+          "explanation": "The retrieved context provides the structure of the LangGraph agent and its nodes, but it does not contain the specific implementation logic regarding recursion limits or the mechanism for preventing infinite tool execution loops described in the ideal answer."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_precision": {
+        "score": 0.0,
+        "relevant_nodes": 0,
+        "total_nodes": 5,
+        "details": {
+          "verdicts": [
+            {
+              "rank": 1,
+              "relevant": false,
+              "reason": "This node describes the workflow topology but does not explain the mechanism used to prevent infinite tool execution loops."
+            },
+            {
+              "rank": 2,
+              "relevant": false,
+              "reason": "This node contains implementation details for the agent node but does not address loop prevention."
+            },
+            {
+              "rank": 3,
+              "relevant": false,
+              "reason": "This node describes the purpose of the GitHub tools and does not contain information about loop prevention."
+            },
+            {
+              "rank": 4,
+              "relevant": false,
+              "reason": "This node is a test case for tool execution, but it does not explain the logic or configuration used to prevent infinite loops."
+            },
+            {
+              "rank": 5,
+              "relevant": false,
+              "reason": "This node imports necessary modules but does not provide any information regarding how the agent prevents infinite tool execution loops."
+            }
+          ],
+          "explanation": "None of the provided nodes contain information regarding the specific mechanism (such as recursion limits, max iterations, or state management) used by the LangGraph agent to prevent infinite tool execution loops. The nodes only describe the graph structure, tool definitions, and testing setup."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_relevancy": {
+        "score": 0.2,
+        "details": {
+          "relevancy_score": 0.2,
+          "relevant_points": [
+            "The retrieved context describes the workflow topology of the agent (START -> agent -> tools -> agent -> END), which implies the structure of the loop but does not explicitly explain the mechanism used to prevent infinite execution."
+          ],
+          "irrelevant_points": [
+            "Chunk 1 and 2 provide boilerplate code for graph initialization.",
+            "Chunk 3 provides irrelevant information about GitHub tool definitions.",
+            "Chunk 4 is a test file that demonstrates a successful execution path, not the prevention mechanism.",
+            "Chunk 5 is boilerplate import statements and configuration."
+          ],
+          "explanation": "The retrieved context provides the structure of the LangGraph agent, but it fails to answer the specific question regarding how infinite tool execution loops are prevented (e.g., via recursion limits, max_iterations, or state-based stopping conditions). The provided chunks are mostly boilerplate code and setup, making them largely irrelevant to the specific technical mechanism requested."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "evaluation_time_seconds": 5.34
+    },
+    {
+      "id": "rp-011",
+      "category": "cross-file",
+      "question": "Which function generates dense vector embeddings, what model is used, and which SQLAlchemy model stores them in PostgreSQL?",
+      "ideal_answer": "embed_chunks in backend/app/embedder.py uses sentence-transformers/all-MiniLM-L6-v2 to produce 384-dimensional vectors, which are saved in the embedding column of the CodeChunk ORM model in backend/app/models.py.",
+      "top_retrieved_files": [
+        "backend/app/embedder.py:L1-L29",
+        "backend/app/indexer.py:L1-L22",
+        "backend/app/search.py:L1-L20",
+        "backend/app/embedder.py:L119-L129",
+        "backend/app/embedder.py:L97-L116"
+      ],
+      "contextual_recall": {
+        "score": 0.75,
+        "details": {
+          "statements": [
+            {
+              "statement": "embed_chunks in backend/app/embedder.py generates dense vector embeddings.",
+              "attributed": true,
+              "reason": "Chunk 5 confirms the function embed_chunks in backend/app/embedder.py generates embeddings."
+            },
+            {
+              "statement": "The model used is sentence-transformers/all-MiniLM-L6-v2.",
+              "attributed": true,
+              "reason": "Chunk 1 explicitly identifies this as the model used."
+            },
+            {
+              "statement": "The model produces 384-dimensional vectors.",
+              "attributed": true,
+              "reason": "Chunk 1 and Chunk 5 confirm the 384-dimensional output."
+            },
+            {
+              "statement": "The vectors are saved in the embedding column of the CodeChunk ORM model in backend/app/models.py.",
+              "attributed": false,
+              "reason": "While Chunk 2 mentions bulk-inserting 'CodeChunk' rows, the provided context does not contain the file 'backend/app/models.py' or explicitly define the 'embedding' column within the CodeChunk ORM model."
+            }
+          ],
+          "recall_score": 0.75,
+          "explanation": "The retrieved context successfully identifies the function, the model, and the dimensionality. However, it fails to provide the specific file path 'backend/app/models.py' or confirm the existence of an 'embedding' column within the CodeChunk ORM model, as that file was not included in the provided context chunks."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_precision": {
+        "score": 0.8875,
+        "relevant_nodes": 4,
+        "total_nodes": 5,
+        "details": {
+          "verdicts": [
+            {
+              "rank": 1,
+              "relevant": true,
+              "reason": "Identifies the model (sentence-transformers/all-MiniLM-L6-v2) used for generating embeddings."
+            },
+            {
+              "rank": 2,
+              "relevant": true,
+              "reason": "Mentions the 'CodeChunk' SQLAlchemy model used for bulk-inserting chunks into PostgreSQL."
+            },
+            {
+              "rank": 3,
+              "relevant": false,
+              "reason": "Discusses search retrieval but does not identify the specific SQLAlchemy model used for storage."
+            },
+            {
+              "rank": 4,
+              "relevant": true,
+              "reason": "Identifies 'embed_query' as a function that generates dense vector embeddings."
+            },
+            {
+              "rank": 5,
+              "relevant": true,
+              "reason": "Identifies 'embed_chunks' as a function that generates dense vector embeddings."
+            }
+          ],
+          "explanation": "The retrieved nodes collectively identify the model (all-MiniLM-L6-v2), the functions responsible for generating embeddings (embed_chunks and embed_query), and the SQLAlchemy model (CodeChunk) used to store these embeddings in PostgreSQL."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_relevancy": {
+        "score": 0.85,
+        "details": {
+          "relevancy_score": 0.85,
+          "relevant_points": [
+            "Chunk 1 identifies the model as 'sentence-transformers/all-MiniLM-L6-v2'.",
+            "Chunk 5 identifies 'embed_chunks' as the function that generates dense vector embeddings.",
+            "Chunk 2 mentions that 'CodeChunk' rows are bulk-inserted into PostgreSQL, implying 'CodeChunk' is the SQLAlchemy model used to store them."
+          ],
+          "irrelevant_points": [
+            "Chunk 3 provides information about the search/retrieval process rather than the storage model or generation function.",
+            "Chunk 4 describes query embedding rather than chunk embedding.",
+            "Boilerplate imports and logging configurations in the provided files."
+          ],
+          "explanation": "The retrieved context contains all the necessary information to answer the user's question. Chunk 1 provides the model name, Chunk 5 provides the generation function, and Chunk 2 identifies the 'CodeChunk' model used for storage. Some chunks (like 3 and 4) are partially irrelevant as they focus on retrieval or query embedding rather than the specific storage and generation pipeline requested."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "evaluation_time_seconds": 17.97
+    },
+    {
+      "id": "rp-016",
+      "category": "debug",
+      "question": "Why would a user receive an HTTP 400 error when attempting to search or ask questions about a repository?",
+      "ideal_answer": "require_indexed in backend/app/routers/helpers.py validates repo.status == 'completed'. If the repository is in 'pending', 'indexing', or 'failed' status, it raises an HTTP 400 Bad Request stating the repository is not indexed yet.",
+      "top_retrieved_files": [
+        "backend/app/routers/helpers.py:L39-L61",
+        "backend/app/routers/helpers.py:L13-L36",
+        "backend/app/mcp_server.py:L1-L25",
+        "backend/app/routers/rag.py:L1-L23",
+        "backend/tests/test_mcp_server.py:L92-L103"
+      ],
+      "contextual_recall": {
+        "score": 0.5,
+        "details": {
+          "statements": [
+            {
+              "statement": "require_indexed in backend/app/routers/helpers.py validates repo.status == 'completed'.",
+              "attributed": true,
+              "reason": "Chunk 1 confirms the function require_indexed checks if repository.status != 'completed'."
+            },
+            {
+              "statement": "If the repository is in 'pending', 'indexing', or 'failed' status, it raises an HTTP 400 Bad Request stating the repository is not indexed yet.",
+              "attributed": false,
+              "reason": "Chunk 1 explicitly states that the function raises an HTTP 409 Conflict, not an HTTP 400 Bad Request."
+            }
+          ],
+          "recall_score": 0.5,
+          "explanation": "The retrieved context contradicts the ideal answer regarding the HTTP status code. The code in the context explicitly raises an HTTP 409 Conflict, whereas the ideal answer claims it raises an HTTP 400 Bad Request."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_precision": {
+        "score": 0.0,
+        "relevant_nodes": 0,
+        "total_nodes": 5,
+        "details": {
+          "verdicts": [
+            {
+              "rank": 1,
+              "relevant": false,
+              "reason": "This node explains why a 409 Conflict error is raised, not a 400 error."
+            },
+            {
+              "rank": 2,
+              "relevant": false,
+              "reason": "This node explains why a 404 Not Found error is raised, not a 400 error."
+            },
+            {
+              "rank": 3,
+              "relevant": false,
+              "reason": "This node shows logic for handling unindexed repositories by returning an empty list, not an HTTP 400 error."
+            },
+            {
+              "rank": 4,
+              "relevant": false,
+              "reason": "This node defines the endpoint for asking questions but does not contain logic or documentation regarding HTTP 400 errors."
+            },
+            {
+              "rank": 5,
+              "relevant": false,
+              "reason": "This test case demonstrates a safe refusal for unindexed repositories, not an HTTP 400 error."
+            }
+          ],
+          "explanation": "None of the provided nodes contain information explaining why a user would receive an HTTP 400 (Bad Request) error. The nodes discuss HTTP 409 (Conflict), HTTP 404 (Not Found), and general RAG pipeline logic, but do not address the specific conditions that trigger a 400 error."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "contextual_relevancy": {
+        "score": 0.1,
+        "details": {
+          "relevancy_score": 0.1,
+          "relevant_points": [],
+          "irrelevant_points": [
+            "Chunk 1 discusses HTTP 409 errors for unindexed repositories.",
+            "Chunk 2 discusses HTTP 404 errors for missing repositories.",
+            "Chunk 3, 4, and 5 discuss RAG implementation and testing but do not mention HTTP 400 errors."
+          ],
+          "explanation": "The provided context contains information about HTTP 409 (Conflict) and HTTP 404 (Not Found) errors, but it does not contain any information regarding the causes of an HTTP 400 (Bad Request) error in the context of searching or asking questions about a repository. Therefore, the retrieved context is almost entirely irrelevant to the specific question asked."
+        },
+        "model": "gemini-3.1-flash-lite"
+      },
+      "evaluation_time_seconds": 9.23
+    }
+  ]
+}

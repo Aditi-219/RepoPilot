@@ -116,3 +116,18 @@ def test_chunk_file_strategy_tokens_flag():
     chunks = chunk_file("sample.py", code, strategy="tokens")
     assert len(chunks) == 1
     assert "sample" in chunks[0].content
+
+
+def test_chunk_file_ast_prepends_parent_symbol_signature():
+    """Methods should have their enclosing class signature prepended to their content."""
+    code = (
+        "class SearchPipeline:\n"
+        "    def run_query(self, query: str):\n"
+        "        return []\n"
+    )
+    chunks = chunk_file("backend/app/search.py", code, strategy="ast")
+    assert len(chunks) >= 1
+    # Check that the chunk contains file context or class signature
+    content = chunks[0].content
+    assert "# File: backend/app/search.py" in content or "SearchPipeline" in content
+

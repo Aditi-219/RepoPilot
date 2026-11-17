@@ -277,6 +277,27 @@ def _get_tree_sitter_parser(language: str | None):
     return parser
 
 
+def _get_parent_signature(node, lines: list[str]) -> str | None:
+    """Traverse up the AST to find an enclosing class or function definition."""
+    curr = node.parent
+    while curr is not None:
+        if curr.type in ("class_definition", "function_definition", "method_definition"):
+            sig_line = lines[curr.start_point.row].strip()
+            return sig_line.rstrip(":").rstrip("{").strip()
+        curr = curr.parent
+    return None
+
+
+def _format_chunk_header(file_path: str, parent_sig: str | None, language: str | None) -> str:
+    """Format a 1-line parent signature / file context header prepended to the chunk."""
+    comment = "//" if language in (
+        "typescript", "javascript", "c", "cpp", "csharp", "java", "rust", "go", "php", "swift", "kotlin"
+    ) else "#"
+    if parent_sig:
+        return f"{comment} In {parent_sig}\n"
+    return f"{comment} File: {file_path}\n"
+
+
 def chunk_file_ast(
     file_path: str,
     content: str,
@@ -373,6 +394,10 @@ def chunk_file_ast(
 
         tokens = _count_tokens(node_text)
 
+        parent_sig = _get_parent_signature(node, lines)
+        header = _format_chunk_header(file_path, parent_sig, language)
+        content_with_header = f"{header}{node_text}"
+
         if tokens <= chunk_size:
             # Whole definition fits in one chunk
             if node_text:
@@ -381,7 +406,7 @@ def chunk_file_ast(
                         file_path=file_path,
                         start_line=start_line,
                         end_line=end_line,
-                        content=node_text,
+                        content=content_with_header,
                         language=language,
                     )
                 )
@@ -437,13 +462,16 @@ def chunk_file_ast(
                             m_end = child.end_point.row + 1
                             m_lines = lines[child.start_point.row : child.end_point.row + 1]
                             m_text = "".join(m_lines).rstrip()
+                            class_sig = lines[node.start_point.row].strip().rstrip(":").rstrip("{").strip()
+                            m_header = _format_chunk_header(file_path, class_sig, language)
+                            m_content = f"{m_header}{m_text}"
                             if _count_tokens(m_text) <= chunk_size:
                                 chunks.append(
                                     Chunk(
                                         file_path=file_path,
                                         start_line=m_start,
                                         end_line=m_end,
-                                        content=m_text,
+                                        content=m_content,
                                         language=language,
                                     )
                                 )

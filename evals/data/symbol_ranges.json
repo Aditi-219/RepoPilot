@@ -1,0 +1,248 @@
+{
+  "backend/app/search.py::RRF_K": {
+    "file_path": "backend/app/search.py",
+    "symbol": "RRF_K",
+    "start_line": 29,
+    "end_line": 29
+  },
+  "backend/app/search.py::_rrf_fusion": {
+    "file_path": "backend/app/search.py",
+    "symbol": "_rrf_fusion",
+    "start_line": 193,
+    "end_line": 245
+  },
+  "backend/app/reranker.py::_get_cross_encoder": {
+    "file_path": "backend/app/reranker.py",
+    "symbol": "_get_cross_encoder",
+    "start_line": 77,
+    "end_line": 115
+  },
+  "backend/app/reranker.py::_neural_rerank": {
+    "file_path": "backend/app/reranker.py",
+    "symbol": "_neural_rerank",
+    "start_line": 118,
+    "end_line": 155
+  },
+  "backend/app/reranker.py::rerank": {
+    "file_path": "backend/app/reranker.py",
+    "symbol": "rerank",
+    "start_line": 158,
+    "end_line": 193
+  },
+  "backend/app/main.py::lifespan": {
+    "file_path": "backend/app/main.py",
+    "symbol": "lifespan",
+    "start_line": 51,
+    "end_line": 91
+  },
+  "backend/app/chunker.py::_get_tree_sitter_parser": {
+    "file_path": "backend/app/chunker.py",
+    "symbol": "_get_tree_sitter_parser",
+    "start_line": 252,
+    "end_line": 277
+  },
+  "backend/app/chunker.py::chunk_file_ast": {
+    "file_path": "backend/app/chunker.py",
+    "symbol": "chunk_file_ast",
+    "start_line": 301,
+    "end_line": 500
+  },
+  "backend/app/routers/chat.py::stream_chat": {
+    "file_path": "backend/app/routers/chat.py",
+    "symbol": "stream_chat",
+    "start_line": 236,
+    "end_line": 344
+  },
+  "backend/app/indexer.py::index_repository": {
+    "file_path": "backend/app/indexer.py",
+    "symbol": "index_repository",
+    "start_line": 45,
+    "end_line": 170
+  },
+  "backend/app/search.py::_semantic_search": {
+    "file_path": "backend/app/search.py",
+    "symbol": "_semantic_search",
+    "start_line": 85,
+    "end_line": 130
+  },
+  "backend/app/search.py::_keyword_search": {
+    "file_path": "backend/app/search.py",
+    "symbol": "_keyword_search",
+    "start_line": 133,
+    "end_line": 190
+  },
+  "backend/app/search.py::hybrid_search": {
+    "file_path": "backend/app/search.py",
+    "symbol": "hybrid_search",
+    "start_line": 248,
+    "end_line": 288
+  },
+  "backend/app/agent/graph.py::create_agent_graph": {
+    "file_path": "backend/app/agent/graph.py",
+    "symbol": "create_agent_graph",
+    "start_line": 68,
+    "end_line": 170
+  },
+  "backend/app/agent/graph.py::agent_node": {
+    "file_path": "backend/app/agent/graph.py",
+    "symbol": "agent_node",
+    "start_line": 95,
+    "end_line": 150
+  },
+  "backend/app/llm_service.py::_try_ollama": {
+    "file_path": "backend/app/llm_service.py",
+    "symbol": "_try_ollama",
+    "start_line": 65,
+    "end_line": 105
+  },
+  "backend/app/llm_service.py::_try_gemini": {
+    "file_path": "backend/app/llm_service.py",
+    "symbol": "_try_gemini",
+    "start_line": 108,
+    "end_line": 151
+  },
+  "backend/app/llm_service.py::ask_with_llm": {
+    "file_path": "backend/app/llm_service.py",
+    "symbol": "ask_with_llm",
+    "start_line": 154,
+    "end_line": 167
+  },
+  "backend/app/chunker.py::_chunk_markdown": {
+    "file_path": "backend/app/chunker.py",
+    "symbol": "_chunk_markdown",
+    "start_line": 183,
+    "end_line": 246
+  },
+  "backend/app/chunker.py::chunk_file": {
+    "file_path": "backend/app/chunker.py",
+    "symbol": "chunk_file",
+    "start_line": 503,
+    "end_line": 542
+  },
+  "backend/app/embedder.py::MODEL_NAME": {
+    "file_path": "backend/app/embedder.py",
+    "symbol": "MODEL_NAME",
+    "start_line": 23,
+    "end_line": 23
+  },
+  "backend/app/embedder.py::embed_chunks": {
+    "file_path": "backend/app/embedder.py",
+    "symbol": "embed_chunks",
+    "start_line": 97,
+    "end_line": 116
+  },
+  "backend/app/models.py::CodeChunk": {
+    "file_path": "backend/app/models.py",
+    "symbol": "CodeChunk",
+    "start_line": 108,
+    "end_line": 177
+  },
+  "backend/app/routers/rag.py::_retrieve_and_rerank": {
+    "file_path": "backend/app/routers/rag.py",
+    "symbol": "_retrieve_and_rerank",
+    "start_line": 29,
+    "end_line": 37
+  },
+  "backend/app/routers/rag.py::ask_repository": {
+    "file_path": "backend/app/routers/rag.py",
+    "symbol": "ask_repository",
+    "start_line": 110,
+    "end_line": 180
+  },
+  "backend/app/tools/github_tools.py::read_source_file": {
+    "file_path": "backend/app/tools/github_tools.py",
+    "symbol": "read_source_file",
+    "start_line": 65,
+    "end_line": 106
+  },
+  "backend/app/github_service.py::fetch_file_content": {
+    "file_path": "backend/app/github_service.py",
+    "symbol": "fetch_file_content",
+    "start_line": 290,
+    "end_line": 345
+  },
+  "backend/app/agent/checkpoint.py::init_checkpointer": {
+    "file_path": "backend/app/agent/checkpoint.py",
+    "symbol": "init_checkpointer",
+    "start_line": 38,
+    "end_line": 76
+  },
+  "backend/app/agent/checkpoint.py::get_checkpointer": {
+    "file_path": "backend/app/agent/checkpoint.py",
+    "symbol": "get_checkpointer",
+    "start_line": 93,
+    "end_line": 98
+  },
+  "backend/app/github_service.py::SUPPORTED_EXTENSIONS": {
+    "file_path": "backend/app/github_service.py",
+    "symbol": "SUPPORTED_EXTENSIONS",
+    "start_line": 25,
+    "end_line": 31
+  },
+  "backend/app/github_service.py::MAX_FILE_BYTES": {
+    "file_path": "backend/app/github_service.py",
+    "symbol": "MAX_FILE_BYTES",
+    "start_line": 36,
+    "end_line": 36
+  },
+  "backend/app/github_service.py::_get_file_extension": {
+    "file_path": "backend/app/github_service.py",
+    "symbol": "_get_file_extension",
+    "start_line": 55,
+    "end_line": 64
+  },
+  "backend/app/github_service.py::fetch_repo_tree": {
+    "file_path": "backend/app/github_service.py",
+    "symbol": "fetch_repo_tree",
+    "start_line": 226,
+    "end_line": 287
+  },
+  "backend/app/routers/helpers.py::require_indexed": {
+    "file_path": "backend/app/routers/helpers.py",
+    "symbol": "require_indexed",
+    "start_line": 39,
+    "end_line": 61
+  },
+  "backend/app/chunker.py::_chunk_by_tokens": {
+    "file_path": "backend/app/chunker.py",
+    "symbol": "_chunk_by_tokens",
+    "start_line": 108,
+    "end_line": 180
+  },
+  "backend/alembic/versions/b71dccb6d03d_initial_schema.py::upgrade": {
+    "file_path": "backend/alembic/versions/b71dccb6d03d_initial_schema.py",
+    "symbol": "upgrade",
+    "start_line": 35,
+    "end_line": 142
+  },
+  "backend/app/schemas.py::RepositoryCreate": {
+    "file_path": "backend/app/schemas.py",
+    "symbol": "RepositoryCreate",
+    "start_line": 21,
+    "end_line": 28
+  },
+  "backend/app/github_service.py::parse_github_url": {
+    "file_path": "backend/app/github_service.py",
+    "symbol": "parse_github_url",
+    "start_line": 67,
+    "end_line": 136
+  },
+  "backend/app/agent/state.py::AgentState": {
+    "file_path": "backend/app/agent/state.py",
+    "symbol": "AgentState",
+    "start_line": 11,
+    "end_line": 25
+  },
+  "backend/app/routers/helpers.py::get_repository_or_404": {
+    "file_path": "backend/app/routers/helpers.py",
+    "symbol": "get_repository_or_404",
+    "start_line": 13,
+    "end_line": 36
+  },
+  "backend/app/models.py::Repository": {
+    "file_path": "backend/app/models.py",
+    "symbol": "Repository",
+    "start_line": 16,
+    "end_line": 105
+  }
+}

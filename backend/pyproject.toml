@@ -10,6 +10,6 @@ ignore = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["."]
+testpaths = ["tests", "../evals/tests"]
+pythonpath = [".", "../evals/scripts"]
 asyncio_mode = "auto"

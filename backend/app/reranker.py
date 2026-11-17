@@ -17,7 +17,13 @@ Set ENABLE_NEURAL_RERANKER=true in your .env to activate neural reranking.
 import logging
 import os
 
+from dotenv import load_dotenv
+
 from app.search import SearchResult
+
+# Ensure backend .env is loaded
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -32,30 +38,80 @@ _CROSS_ENCODER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 _cross_encoder = None
 
 
+class _SafetensorsCrossEncoder:
+    """Offline cross-encoder wrapper using cached safetensors weights."""
+
+    def __init__(self, model_dir: str):
+        import safetensors.torch
+        from transformers import AutoConfig, AutoTokenizer, BertForSequenceClassification
+
+        self.tokenizer = AutoTokenizer.from_pretrained(model_dir)
+        config = AutoConfig.from_pretrained(os.path.join(model_dir, "config.json"))
+        weights = safetensors.torch.load_file(os.path.join(model_dir, "model.safetensors"))
+        self.model = BertForSequenceClassification(config)
+        self.model.load_state_dict(weights, strict=False)
+        self.model.eval()
+
+    def predict(self, pairs: list[tuple[str, str]]) -> list[float]:
+        import torch
+
+        if not pairs:
+            return []
+        queries = [p[0] for p in pairs]
+        texts = [p[1] for p in pairs]
+        inputs = self.tokenizer(
+            queries,
+            texts,
+            padding=True,
+            truncation=True,
+            max_length=256,
+            return_tensors="pt",
+        )
+        with torch.no_grad():
+            logits = self.model(**inputs).logits.squeeze(-1)
+            if logits.ndim == 0:
+                return [float(logits.item())]
+            return logits.tolist()
+
+
 def _get_cross_encoder():
     """Lazily load the cross-encoder model on first use.
 
     Returns:
-        A sentence_transformers.CrossEncoder instance, or None on import error.
+        A CrossEncoder instance or _SafetensorsCrossEncoder fallback, or None on error.
     """
     global _cross_encoder  # noqa: PLW0603
     if _cross_encoder is not None:
         return _cross_encoder
 
+    # 1. First, check local HuggingFace cache snapshot (avoids network timeouts & auth blocks)
+    try:
+        cache_base = os.path.expanduser(
+            "~/.cache/huggingface/hub/models--cross-encoder--ms-marco-MiniLM-L-6-v2/snapshots"
+        )
+        if os.path.isdir(cache_base):
+            for snap in os.listdir(cache_base):
+                snap_dir = os.path.join(cache_base, snap)
+                if os.path.isfile(os.path.join(snap_dir, "model.safetensors")):
+                    _cross_encoder = _SafetensorsCrossEncoder(snap_dir)
+                    logger.info("Neural cross-encoder loaded from local snapshot: %s", snap_dir)
+                    return _cross_encoder
+    except Exception as exc:
+        logger.debug("Local safetensors cross-encoder load skipped: %s", exc)
+
+    # 2. Fall back to standard sentence_transformers CrossEncoder
     try:
         from sentence_transformers import CrossEncoder  # noqa: PLC0415
 
         logger.info("Loading neural cross-encoder: %s", _CROSS_ENCODER_MODEL)
         _cross_encoder = CrossEncoder(_CROSS_ENCODER_MODEL)
-        logger.info("Neural cross-encoder loaded successfully.")
+        logger.info("Neural cross-encoder loaded successfully via sentence-transformers.")
+        return _cross_encoder
     except Exception as exc:
-        logger.warning(
-            "Could not load cross-encoder model '%s' (falling back to heuristic): %s",
-            _CROSS_ENCODER_MODEL,
-            exc,
-        )
-        _cross_encoder = None
+        logger.warning("Standard CrossEncoder init failed: %s", exc)
 
+    logger.warning("Could not load cross-encoder model '%s' (falling back to heuristic).", _CROSS_ENCODER_MODEL)
+    _cross_encoder = None
     return _cross_encoder
 
 

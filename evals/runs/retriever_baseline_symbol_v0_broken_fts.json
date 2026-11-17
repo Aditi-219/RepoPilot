@@ -1,0 +1,2091 @@
+{
+  "timestamp": "20261117_133933",
+  "level": "symbol",
+  "k_pool": 50,
+  "total_examples": 22,
+  "evaluated_examples": 18,
+  "summary": {
+    "dense": {
+      "Hit@1": 0.0556,
+      "Hit@3": 0.1667,
+      "Hit@5": 0.4444,
+      "Recall@5": 0.2611,
+      "Precision@5": 0.1,
+      "MRR": 0.1877,
+      "nDCG@5": 0.1683
+    },
+    "fts": {
+      "Hit@1": 0.0556,
+      "Hit@3": 0.0556,
+      "Hit@5": 0.0556,
+      "Recall@5": 0.0556,
+      "Precision@5": 0.0111,
+      "MRR": 0.0556,
+      "nDCG@5": 0.0556
+    },
+    "fused": {
+      "Hit@1": 0.1111,
+      "Hit@3": 0.1667,
+      "Hit@5": 0.5,
+      "Recall@5": 0.3167,
+      "Precision@5": 0.1111,
+      "MRR": 0.2341,
+      "nDCG@5": 0.22
+    },
+    "reranked": {
+      "Hit@1": 0.1111,
+      "Hit@3": 0.1667,
+      "Hit@5": 0.5,
+      "Recall@5": 0.3167,
+      "Precision@5": 0.1111,
+      "MRR": 0.2341,
+      "nDCG@5": 0.22
+    }
+  },
+  "category_breakdown_reranked": {
+    "cross-file": {
+      "Hit@1": 0.0,
+      "Hit@3": 0.0,
+      "Hit@5": 0.25,
+      "Recall@5": 0.05,
+      "Precision@5": 0.05,
+      "MRR": 0.0557,
+      "nDCG@5": 0.0328
+    },
+    "debug": {
+      "Hit@1": 0.25,
+      "Hit@3": 0.25,
+      "Hit@5": 0.75,
+      "Recall@5": 0.5833,
+      "Precision@5": 0.15,
+      "MRR": 0.3937,
+      "nDCG@5": 0.4031
+    },
+    "explain": {
+      "Hit@1": 0.0,
+      "Hit@3": 0.0,
+      "Hit@5": 0.2,
+      "Recall@5": 0.1,
+      "Precision@5": 0.04,
+      "MRR": 0.1034,
+      "nDCG@5": 0.0528
+    },
+    "locate": {
+      "Hit@1": 0.2,
+      "Hit@3": 0.4,
+      "Hit@5": 0.8,
+      "Recall@5": 0.5333,
+      "Precision@5": 0.2,
+      "MRR": 0.38,
+      "nDCG@5": 0.3904
+    }
+  },
+  "query_details": [
+    {
+      "id": "rp-001",
+      "category": "locate",
+      "question": "Where is Reciprocal Rank Fusion (RRF) implemented to combine semantic and keyword search rankings?",
+      "gt_files": [
+        "backend/app/search.py"
+      ],
+      "gt_symbols": [
+        "_rrf_fusion",
+        "RRF_K"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 1.0,
+            "Recall@3": 0.5,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.2,
+            "MRR": 0.3333,
+            "nDCG@3": 0.3066,
+            "nDCG@5": 0.3066,
+            "nDCG@10": 0.525
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L140-L148",
+            "docs/13-rag-and-code-retrieval.md:L95-L103",
+            "backend/app/search.py:L1-L40"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/02-feature-inventory.md:L1-L13",
+            "docs/04-repository-structure.md:L38-L59"
+          ]
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.2,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2372,
+            "nDCG@10": 0.4306
+          },
+          "top_3_retrieved": [
+            "docs/04-repository-structure.md:L38-L59",
+            "docs/02-feature-inventory.md:L1-L13",
+            "docs/20-resume-and-interview-preparation.md:L140-L148"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.2,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2372,
+            "nDCG@10": 0.4306
+          },
+          "top_3_retrieved": [
+            "docs/04-repository-structure.md:L38-L59",
+            "docs/02-feature-inventory.md:L1-L13",
+            "docs/20-resume-and-interview-preparation.md:L140-L148"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-002",
+      "category": "locate",
+      "question": "Where is the neural cross-encoder model loaded and invoked for candidate reranking?",
+      "gt_files": [
+        "backend/app/reranker.py"
+      ],
+      "gt_symbols": [
+        "_get_cross_encoder",
+        "_neural_rerank",
+        "rerank"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 1.0,
+            "Recall@3": 0.3333,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 0.6667,
+            "Precision@5": 0.4,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.3,
+            "MRR": 0.5,
+            "nDCG@3": 0.2961,
+            "nDCG@5": 0.4776,
+            "nDCG@10": 0.634
+          },
+          "top_3_retrieved": [
+            "docs/18-known-limitations-and-technical-debt.md:L59-L67",
+            "backend/app/reranker.py:L62-L99",
+            "docs/13-rag-and-code-retrieval.md:L104-L110"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 1.0,
+            "Recall@3": 0.3333,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 0.6667,
+            "Precision@5": 0.4,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.3,
+            "MRR": 0.5,
+            "nDCG@3": 0.2961,
+            "nDCG@5": 0.4776,
+            "nDCG@10": 0.634
+          },
+          "top_3_retrieved": [
+            "docs/18-known-limitations-and-technical-debt.md:L59-L67",
+            "backend/app/reranker.py:L62-L99",
+            "docs/13-rag-and-code-retrieval.md:L104-L110"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 1.0,
+            "Recall@3": 0.3333,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 0.6667,
+            "Precision@5": 0.4,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.3,
+            "MRR": 0.5,
+            "nDCG@3": 0.2961,
+            "nDCG@5": 0.4776,
+            "nDCG@10": 0.634
+          },
+          "top_3_retrieved": [
+            "docs/18-known-limitations-and-technical-debt.md:L59-L67",
+            "backend/app/reranker.py:L62-L99",
+            "docs/13-rag-and-code-retrieval.md:L104-L110"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-003",
+      "category": "locate",
+      "question": "Where are the HNSW vector cosine distance index and full-text search GIN index created in the database?",
+      "gt_files": [
+        "backend/app/main.py"
+      ],
+      "gt_symbols": [
+        "lifespan"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0303,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L163-L169",
+            "docs/02-feature-inventory.md:L12-L15",
+            "backend/alembic/versions/b71dccb6d03d_initial_schema.py:L47-L108"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 1.0,
+            "Recall@1": 1.0,
+            "Precision@1": 1.0,
+            "Hit@3": 1.0,
+            "Recall@3": 1.0,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 1.0,
+            "nDCG@3": 1.0,
+            "nDCG@5": 1.0,
+            "nDCG@10": 1.0
+          },
+          "top_3_retrieved": [
+            "backend/app/main.py:L50-L91"
+          ]
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 1.0,
+            "Recall@1": 1.0,
+            "Precision@1": 1.0,
+            "Hit@3": 1.0,
+            "Recall@3": 1.0,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 1.0,
+            "nDCG@3": 1.0,
+            "nDCG@5": 1.0,
+            "nDCG@10": 1.0
+          },
+          "top_3_retrieved": [
+            "backend/app/main.py:L50-L91",
+            "docs/20-resume-and-interview-preparation.md:L163-L169",
+            "docs/02-feature-inventory.md:L12-L15"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 1.0,
+            "Recall@1": 1.0,
+            "Precision@1": 1.0,
+            "Hit@3": 1.0,
+            "Recall@3": 1.0,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 1.0,
+            "nDCG@3": 1.0,
+            "nDCG@5": 1.0,
+            "nDCG@10": 1.0
+          },
+          "top_3_retrieved": [
+            "backend/app/main.py:L50-L91",
+            "docs/20-resume-and-interview-preparation.md:L163-L169",
+            "docs/02-feature-inventory.md:L12-L15"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-004",
+      "category": "locate",
+      "question": "Where is Tree-sitter AST parsing configured to extract classes, functions, and methods for chunking?",
+      "gt_files": [
+        "backend/app/chunker.py"
+      ],
+      "gt_symbols": [
+        "_get_tree_sitter_parser",
+        "chunk_file_ast"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2372,
+            "nDCG@10": 0.2372
+          },
+          "top_3_retrieved": [
+            "docs/13-rag-and-code-retrieval.md:L1-L16",
+            "docs/02-feature-inventory.md:L8-L11",
+            "backend/app/chunker.py:L1-L49"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2372,
+            "nDCG@10": 0.2372
+          },
+          "top_3_retrieved": [
+            "docs/13-rag-and-code-retrieval.md:L1-L16",
+            "docs/02-feature-inventory.md:L8-L11",
+            "backend/app/chunker.py:L1-L49"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2372,
+            "nDCG@10": 0.2372
+          },
+          "top_3_retrieved": [
+            "docs/13-rag-and-code-retrieval.md:L1-L16",
+            "docs/02-feature-inventory.md:L8-L11",
+            "backend/app/chunker.py:L1-L49"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-005",
+      "category": "locate",
+      "question": "Where is the Server-Sent Events (SSE) streaming chat endpoint implemented?",
+      "gt_files": [
+        "backend/app/routers/chat.py"
+      ],
+      "gt_symbols": [
+        "stream_chat"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/02-feature-inventory.md:L24-L29",
+            "docs/20-resume-and-interview-preparation.md:L170-L176",
+            "backend/app/routers/chat.py:L1-L47"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/02-feature-inventory.md:L24-L29",
+            "docs/20-resume-and-interview-preparation.md:L170-L176",
+            "backend/app/routers/chat.py:L1-L47"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/02-feature-inventory.md:L24-L29",
+            "docs/20-resume-and-interview-preparation.md:L170-L176",
+            "backend/app/routers/chat.py:L1-L47"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-006",
+      "category": "explain",
+      "question": "How does repository ingestion work from fetching the file tree to inserting embedded chunks?",
+      "gt_files": [
+        "backend/app/indexer.py"
+      ],
+      "gt_symbols": [
+        "index_repository"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0526,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/19-developer-learning-guide.md:L41-L42",
+            "docs/architecture.md:L63-L76",
+            "backend/app/chunker.py:L475-L514"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0526,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/19-developer-learning-guide.md:L41-L42",
+            "docs/architecture.md:L63-L76",
+            "backend/app/chunker.py:L475-L514"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0526,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/19-developer-learning-guide.md:L41-L42",
+            "docs/architecture.md:L63-L76",
+            "backend/app/chunker.py:L475-L514"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-007",
+      "category": "explain",
+      "question": "How does the hybrid search function combine dense vector search with sparse full-text search?",
+      "gt_files": [
+        "backend/app/search.py"
+      ],
+      "gt_symbols": [
+        "hybrid_search",
+        "_semantic_search",
+        "_keyword_search",
+        "_rrf_fusion"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0714,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L31-L36",
+            "docs/20-resume-and-interview-preparation.md:L101-L107",
+            "docs/02-feature-inventory.md:L12-L15"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/04-repository-structure.md:L38-L59"
+          ]
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0714,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/04-repository-structure.md:L38-L59",
+            "docs/20-resume-and-interview-preparation.md:L31-L36",
+            "docs/20-resume-and-interview-preparation.md:L101-L107"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0714,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/04-repository-structure.md:L38-L59",
+            "docs/20-resume-and-interview-preparation.md:L31-L36",
+            "docs/20-resume-and-interview-preparation.md:L101-L107"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-008",
+      "category": "explain",
+      "question": "How does the LangGraph agent prevent infinite tool execution loops?",
+      "gt_files": [
+        "backend/app/agent/graph.py"
+      ],
+      "gt_symbols": [
+        "create_agent_graph",
+        "agent_node"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L124-L132",
+            "docs/04-repository-structure.md:L1-L22",
+            "docs/19-developer-learning-guide.md:L104-L105"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L124-L132"
+          ]
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L124-L132",
+            "docs/04-repository-structure.md:L1-L22",
+            "docs/19-developer-learning-guide.md:L104-L105"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L124-L132",
+            "docs/04-repository-structure.md:L1-L22",
+            "docs/19-developer-learning-guide.md:L104-L105"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-009",
+      "category": "explain",
+      "question": "How does RepoPilot decide whether to use local Ollama or cloud Gemini for RAG answer generation?",
+      "gt_files": [
+        "backend/app/llm_service.py"
+      ],
+      "gt_symbols": [
+        "ask_with_llm",
+        "_try_ollama",
+        "_try_gemini"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 1.0,
+            "Recall@10": 0.6667,
+            "Precision@10": 0.2,
+            "MRR": 0.1429,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.2921
+          },
+          "top_3_retrieved": [
+            "backend/app/llm_service.py:L1-L41",
+            "docs/11-llm-prompts-and-model-integration.md:L25-L38",
+            "docs/11-llm-prompts-and-model-integration.md:L3-L24"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 1.0,
+            "Recall@10": 0.6667,
+            "Precision@10": 0.2,
+            "MRR": 0.1429,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.2921
+          },
+          "top_3_retrieved": [
+            "backend/app/llm_service.py:L1-L41",
+            "docs/11-llm-prompts-and-model-integration.md:L25-L38",
+            "docs/11-llm-prompts-and-model-integration.md:L3-L24"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 1.0,
+            "Recall@10": 0.6667,
+            "Precision@10": 0.2,
+            "MRR": 0.1429,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.2921
+          },
+          "top_3_retrieved": [
+            "backend/app/llm_service.py:L1-L41",
+            "docs/11-llm-prompts-and-model-integration.md:L25-L38",
+            "docs/11-llm-prompts-and-model-integration.md:L3-L24"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-010",
+      "category": "explain",
+      "question": "How are Markdown files chunked differently from regular source code files?",
+      "gt_files": [
+        "backend/app/chunker.py"
+      ],
+      "gt_symbols": [
+        "_chunk_markdown",
+        "chunk_file"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.25,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2641,
+            "nDCG@10": 0.2641
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L149-L155",
+            "docs/04-repository-structure.md:L19-L37",
+            "docs/13-rag-and-code-retrieval.md:L17-L29"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.25,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2641,
+            "nDCG@10": 0.2641
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L149-L155",
+            "docs/04-repository-structure.md:L19-L37",
+            "docs/13-rag-and-code-retrieval.md:L17-L29"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.5,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.25,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.2641,
+            "nDCG@10": 0.2641
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L149-L155",
+            "docs/04-repository-structure.md:L19-L37",
+            "docs/13-rag-and-code-retrieval.md:L17-L29"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-011",
+      "category": "cross-file",
+      "question": "Which function generates dense vector embeddings, what model is used, and which SQLAlchemy model stores them in PostgreSQL?",
+      "gt_files": [
+        "backend/app/embedder.py",
+        "backend/app/models.py"
+      ],
+      "gt_symbols": [
+        "embed_chunks",
+        "MODEL_NAME",
+        "CodeChunk"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0227,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/03-architecture.md:L389-L397",
+            "backend/app/models.py:L1-L15",
+            "docs/20-resume-and-interview-preparation.md:L156-L162"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0227,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/03-architecture.md:L389-L397",
+            "backend/app/models.py:L1-L15",
+            "docs/20-resume-and-interview-preparation.md:L156-L162"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0227,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/03-architecture.md:L389-L397",
+            "backend/app/models.py:L1-L15",
+            "docs/20-resume-and-interview-preparation.md:L156-L162"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-012",
+      "category": "cross-file",
+      "question": "How does the codebase Q&A endpoint retrieve snippets and generate a grounded response?",
+      "gt_files": [
+        "backend/app/routers/rag.py",
+        "backend/app/search.py",
+        "backend/app/reranker.py",
+        "backend/app/llm_service.py"
+      ],
+      "gt_symbols": [
+        "ask_repository",
+        "_retrieve_and_rerank",
+        "hybrid_search",
+        "rerank",
+        "ask_with_llm"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.2,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.2,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.1312,
+            "nDCG@10": 0.1312
+          },
+          "top_3_retrieved": [
+            "docs/02-feature-inventory.md:L1-L16",
+            "backend/app/schemas.py:L157-L174",
+            "backend/app/llm_service.py:L53-L62"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.2,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.2,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.1312,
+            "nDCG@10": 0.1312
+          },
+          "top_3_retrieved": [
+            "docs/02-feature-inventory.md:L1-L16",
+            "backend/app/schemas.py:L157-L174",
+            "backend/app/llm_service.py:L53-L62"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.2,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.2,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.1312,
+            "nDCG@10": 0.1312
+          },
+          "top_3_retrieved": [
+            "docs/02-feature-inventory.md:L1-L16",
+            "backend/app/schemas.py:L157-L174",
+            "backend/app/llm_service.py:L53-L62"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-013",
+      "category": "cross-file",
+      "question": "Which agent tool reads source files, and which GitHub service function retrieves and decodes the file content?",
+      "gt_files": [
+        "backend/app/tools/github_tools.py",
+        "backend/app/github_service.py"
+      ],
+      "gt_symbols": [
+        "read_source_file",
+        "fetch_file_content"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L200-L209",
+            "docs/10-langgraph-and-agent-workflows.md:L112-L115",
+            "backend/app/tools/github_tools.py:L1-L14"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L200-L209",
+            "docs/10-langgraph-and-agent-workflows.md:L112-L115",
+            "backend/app/tools/github_tools.py:L1-L14"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/20-resume-and-interview-preparation.md:L200-L209",
+            "docs/10-langgraph-and-agent-workflows.md:L112-L115",
+            "backend/app/tools/github_tools.py:L1-L14"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-014",
+      "category": "cross-file",
+      "question": "Where is durable conversation checkpointing initialized and bound to the LangGraph execution in FastAPI?",
+      "gt_files": [
+        "backend/app/agent/checkpoint.py",
+        "backend/app/main.py",
+        "backend/app/routers/chat.py"
+      ],
+      "gt_symbols": [
+        "init_checkpointer",
+        "lifespan",
+        "get_checkpointer",
+        "create_agent_graph"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "backend/tests/test_chat_router.py:L1-L15",
+            "docs/20-resume-and-interview-preparation.md:L75-L81",
+            "docs/10-langgraph-and-agent-workflows.md:L1-L33"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "docs/03-architecture.md:L3-L18"
+          ]
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "backend/tests/test_chat_router.py:L1-L15",
+            "docs/03-architecture.md:L3-L18",
+            "docs/20-resume-and-interview-preparation.md:L75-L81"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": [
+            "backend/tests/test_chat_router.py:L1-L15",
+            "docs/03-architecture.md:L3-L18",
+            "docs/20-resume-and-interview-preparation.md:L75-L81"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-015",
+      "category": "debug",
+      "question": "Why might a repository file be excluded or skipped during the indexing file tree traversal?",
+      "gt_files": [
+        "backend/app/github_service.py"
+      ],
+      "gt_symbols": [
+        "fetch_repo_tree",
+        "SUPPORTED_EXTENSIONS",
+        "MAX_FILE_BYTES",
+        "_get_file_extension"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.125,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.1232
+          },
+          "top_3_retrieved": [
+            "docs/03-architecture.md:L1-L35",
+            "backend/app/tools/github_tools.py:L35-L61",
+            "backend/app/mcp_server.py:L55-L79"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.125,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.1232
+          },
+          "top_3_retrieved": [
+            "docs/03-architecture.md:L1-L35",
+            "backend/app/tools/github_tools.py:L35-L61",
+            "backend/app/mcp_server.py:L55-L79"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 1.0,
+            "Recall@10": 0.5,
+            "Precision@10": 0.1,
+            "MRR": 0.125,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.1232
+          },
+          "top_3_retrieved": [
+            "docs/03-architecture.md:L1-L35",
+            "backend/app/tools/github_tools.py:L35-L61",
+            "backend/app/mcp_server.py:L55-L79"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-016",
+      "category": "debug",
+      "question": "Why would a user receive an HTTP 400 error when attempting to search or ask questions about a repository?",
+      "gt_files": [
+        "backend/app/routers/helpers.py"
+      ],
+      "gt_symbols": [
+        "require_indexed"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 1.0,
+            "Recall@1": 1.0,
+            "Precision@1": 1.0,
+            "Hit@3": 1.0,
+            "Recall@3": 1.0,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 1.0,
+            "nDCG@3": 1.0,
+            "nDCG@5": 1.0,
+            "nDCG@10": 1.0
+          },
+          "top_3_retrieved": [
+            "backend/app/routers/helpers.py:L39-L61",
+            "docs/06-application-flow.md:L1-L13",
+            "docs/14-security-and-error-handling.md:L106-L116"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 1.0,
+            "Recall@1": 1.0,
+            "Precision@1": 1.0,
+            "Hit@3": 1.0,
+            "Recall@3": 1.0,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 1.0,
+            "nDCG@3": 1.0,
+            "nDCG@5": 1.0,
+            "nDCG@10": 1.0
+          },
+          "top_3_retrieved": [
+            "backend/app/routers/helpers.py:L39-L61",
+            "docs/06-application-flow.md:L1-L13",
+            "docs/14-security-and-error-handling.md:L106-L116"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 1.0,
+            "Recall@1": 1.0,
+            "Precision@1": 1.0,
+            "Hit@3": 1.0,
+            "Recall@3": 1.0,
+            "Precision@3": 0.3333,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 1.0,
+            "nDCG@3": 1.0,
+            "nDCG@5": 1.0,
+            "nDCG@10": 1.0
+          },
+          "top_3_retrieved": [
+            "backend/app/routers/helpers.py:L39-L61",
+            "docs/06-application-flow.md:L1-L13",
+            "docs/14-security-and-error-handling.md:L106-L116"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-017",
+      "category": "debug",
+      "question": "How does the agent node handle an interrupted turn where the model previously emitted a tool call that was never answered?",
+      "gt_files": [
+        "backend/app/agent/graph.py"
+      ],
+      "gt_symbols": [
+        "agent_node"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 0.25,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.4307,
+            "nDCG@10": 0.4307
+          },
+          "top_3_retrieved": [
+            "docs/19-developer-learning-guide.md:L124-L128",
+            "backend/tests/test_agent_graph.py:L194-L226",
+            "docs/10-langgraph-and-agent-workflows.md:L71-L81"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 0.25,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.4307,
+            "nDCG@10": 0.4307
+          },
+          "top_3_retrieved": [
+            "docs/19-developer-learning-guide.md:L124-L128",
+            "backend/tests/test_agent_graph.py:L194-L226",
+            "docs/10-langgraph-and-agent-workflows.md:L71-L81"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 1.0,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 1.0,
+            "Precision@10": 0.1,
+            "MRR": 0.25,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.4307,
+            "nDCG@10": 0.4307
+          },
+          "top_3_retrieved": [
+            "docs/19-developer-learning-guide.md:L124-L128",
+            "backend/tests/test_agent_graph.py:L194-L226",
+            "docs/10-langgraph-and-agent-workflows.md:L71-L81"
+          ]
+        }
+      }
+    },
+    {
+      "id": "rp-018",
+      "category": "debug",
+      "question": "What fallback occurs if Tree-sitter fails to initialize or parse a source code file during AST chunking?",
+      "gt_files": [
+        "backend/app/chunker.py"
+      ],
+      "gt_symbols": [
+        "chunk_file_ast",
+        "_chunk_by_tokens",
+        "_get_tree_sitter_parser"
+      ],
+      "stages": {
+        "dense": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.3333,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.3333,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.1815,
+            "nDCG@10": 0.1815
+          },
+          "top_3_retrieved": [
+            "docs/13-rag-and-code-retrieval.md:L1-L16",
+            "backend/app/chunker.py:L1-L49",
+            "docs/02-feature-inventory.md:L8-L11"
+          ]
+        },
+        "fts": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 0.0,
+            "Recall@5": 0.0,
+            "Precision@5": 0.0,
+            "Hit@10": 0.0,
+            "Recall@10": 0.0,
+            "Precision@10": 0.0,
+            "MRR": 0.0,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.0,
+            "nDCG@10": 0.0
+          },
+          "top_3_retrieved": []
+        },
+        "fused": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.3333,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.3333,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.1815,
+            "nDCG@10": 0.1815
+          },
+          "top_3_retrieved": [
+            "docs/13-rag-and-code-retrieval.md:L1-L16",
+            "backend/app/chunker.py:L1-L49",
+            "docs/02-feature-inventory.md:L8-L11"
+          ]
+        },
+        "reranked": {
+          "metrics": {
+            "Hit@1": 0.0,
+            "Recall@1": 0.0,
+            "Precision@1": 0.0,
+            "Hit@3": 0.0,
+            "Recall@3": 0.0,
+            "Precision@3": 0.0,
+            "Hit@5": 1.0,
+            "Recall@5": 0.3333,
+            "Precision@5": 0.2,
+            "Hit@10": 1.0,
+            "Recall@10": 0.3333,
+            "Precision@10": 0.1,
+            "MRR": 0.2,
+            "nDCG@3": 0.0,
+            "nDCG@5": 0.1815,
+            "nDCG@10": 0.1815
+          },
+          "top_3_retrieved": [
+            "docs/13-rag-and-code-retrieval.md:L1-L16",
+            "backend/app/chunker.py:L1-L49",
+            "docs/02-feature-inventory.md:L8-L11"
+          ]
+        }
+      }
+    }
+  ]
+}
