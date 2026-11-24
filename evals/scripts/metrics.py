@@ -234,6 +234,85 @@ def ndcg_at_k(
     return dcg / idcg if idcg > 0.0 else 0.0
 
 
+def chunk_hit_at_k(
+    ranked_chunks: list[dict[str, Any]],
+    gt_files: list[str],
+    gt_symbols: list[str] | None = None,
+    symbol_ranges: dict[str, dict[str, Any]] | None = None,
+    k: int = 5,
+) -> float:
+    """Tight chunk-level retrieval metric requiring line-span overlap.
+
+    Checks whether any chunk in the top-k:
+    1. Matches any file in gt_files, AND
+    2. Has a line range that overlaps the ground-truth definition line span
+       in symbol_ranges for at least one symbol in gt_symbols.
+       (If gt_symbols is empty, file-level match is sufficient).
+
+    Returns:
+        1.0 if a definition line-overlap hit is found in top-k, else 0.0.
+    """
+    if not gt_files:
+        return 0.0
+
+    for chunk in ranked_chunks[:k]:
+        file_path = chunk.get("file_path", "")
+        if file_path not in gt_files:
+            continue
+
+        if not gt_symbols:
+            return 1.0
+
+        c_start = chunk.get("start_line", 0)
+        c_end = chunk.get("end_line", 0)
+
+        if symbol_ranges:
+            for sym in gt_symbols:
+                key = f"{file_path}::{sym}"
+                if key in symbol_ranges:
+                    s_start = symbol_ranges[key]["start_line"]
+                    s_end = symbol_ranges[key]["end_line"]
+                    if max(c_start, s_start) <= min(c_end, s_end):
+                        return 1.0
+
+    return 0.0
+
+
+def chunk_mention_at_k(
+    ranked_chunks: list[dict[str, Any]],
+    gt_files: list[str],
+    gt_symbols: list[str] | None = None,
+    k: int = 5,
+) -> float:
+    """Chunk-level retrieval metric checking for symbol name mention.
+
+    Checks whether any chunk in the top-k:
+    1. Matches any file in gt_files, AND
+    2. Contains at least one gt_symbols name in its text content.
+       (If gt_symbols is empty, file-level match is sufficient).
+
+    Returns:
+        1.0 if a symbol name is mentioned in top-k chunks, else 0.0.
+    """
+    if not gt_files:
+        return 0.0
+
+    for chunk in ranked_chunks[:k]:
+        file_path = chunk.get("file_path", "")
+        if file_path not in gt_files:
+            continue
+
+        if not gt_symbols:
+            return 1.0
+
+        content = chunk.get("content", "")
+        for sym in gt_symbols:
+            if sym and sym in content:
+                return 1.0
+
+    return 0.0
+
+
 def compute_all_metrics(
     ranked_chunks: list[dict[str, Any]],
     gt_files: list[str],
@@ -254,5 +333,8 @@ def compute_all_metrics(
 
     for k in (3, 5, 10):
         results[f"nDCG@{k}"] = round(ndcg_at_k(ranked_chunks, gt_files, k, gt_symbols, symbol_ranges, level), 4)
+
+    results["ChunkHit@5"] = round(chunk_hit_at_k(ranked_chunks, gt_files, gt_symbols, symbol_ranges, k=5), 4)
+    results["ChunkMention@5"] = round(chunk_mention_at_k(ranked_chunks, gt_files, gt_symbols, k=5), 4)
 
     return results

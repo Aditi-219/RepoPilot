@@ -111,6 +111,7 @@ def _chunk_by_tokens(
     language: str | None,
     chunk_size: int,
     overlap: int,
+    start_line_offset: int = 1,
 ) -> list[Chunk]:
     """Split a list of lines into overlapping token-bounded chunks.
 
@@ -120,11 +121,12 @@ def _chunk_by_tokens(
     3. Roll back 'overlap' tokens worth of lines to create the next window.
 
     Args:
-        lines:      Lines of the source file (preserving newlines).
-        file_path:  Relative file path for metadata.
-        language:   Detected language name.
-        chunk_size: Maximum tokens per chunk.
-        overlap:    Number of overlap tokens between consecutive chunks.
+        lines:             Lines of the source file (preserving newlines).
+        file_path:         Relative file path for metadata.
+        language:          Detected language name.
+        chunk_size:        Maximum tokens per chunk.
+        overlap:           Number of overlap tokens between consecutive chunks.
+        start_line_offset: The 1-indexed line offset of the first line in `lines`.
 
     Returns:
         List of Chunk objects.
@@ -133,7 +135,7 @@ def _chunk_by_tokens(
 
     current_lines: list[str] = []
     current_tokens: int = 0
-    start_line: int = 1  # 1-indexed
+    start_line: int = start_line_offset
 
     for i, line in enumerate(lines, start=1):
         line_tokens = _count_tokens(line)
@@ -146,7 +148,7 @@ def _chunk_by_tokens(
                 chunks.append(Chunk(
                     file_path=file_path,
                     start_line=start_line,
-                    end_line=i,
+                    end_line=start_line_offset + i - 1,
                     content=content,
                     language=language,
                 ))
@@ -163,8 +165,8 @@ def _chunk_by_tokens(
 
             current_lines = overlap_lines
             current_tokens = overlap_tokens
-            # Start line of the new window = (i + 1) - len(overlap_lines)
-            start_line = i + 1 - len(overlap_lines)
+            # Start line of the new window relative to start_line_offset
+            start_line = start_line_offset + i - len(overlap_lines)
 
     # Emit the final chunk (whatever is left over)
     content = "".join(current_lines).rstrip()
@@ -172,7 +174,7 @@ def _chunk_by_tokens(
         chunks.append(Chunk(
             file_path=file_path,
             start_line=start_line,
-            end_line=len(lines),
+            end_line=start_line_offset + len(lines) - 1,
             content=content,
             language=language,
         ))
@@ -240,7 +242,7 @@ def _chunk_markdown(
         else:
             # Large section — further split by tokens
             chunks.extend(
-                _chunk_by_tokens(section_lines, file_path, language, chunk_size, overlap)
+                _chunk_by_tokens(section_lines, file_path, language, chunk_size, overlap, start_line_offset=s_start)
             )
 
     return chunks
@@ -358,7 +360,14 @@ def chunk_file_ast(
                 )
             else:
                 chunks.extend(
-                    _chunk_by_tokens(pending_lines, file_path, language, chunk_size, overlap)
+                    _chunk_by_tokens(
+                        pending_lines,
+                        file_path,
+                        language,
+                        chunk_size,
+                        overlap,
+                        start_line_offset=pending_start,
+                    )
                 )
         pending_lines = []
 
@@ -477,13 +486,27 @@ def chunk_file_ast(
                                 )
                             else:
                                 chunks.extend(
-                                    _chunk_by_tokens(m_lines, file_path, language, chunk_size, overlap)
+                                    _chunk_by_tokens(
+                                        m_lines,
+                                        file_path,
+                                        language,
+                                        chunk_size,
+                                        overlap,
+                                        start_line_offset=m_start,
+                                    )
                                 )
                     return
 
             # For functions or classes without granular methods, fall back to sliding token window
             chunks.extend(
-                _chunk_by_tokens(node_lines, file_path, language, chunk_size, overlap)
+                _chunk_by_tokens(
+                    node_lines,
+                    file_path,
+                    language,
+                    chunk_size,
+                    overlap,
+                    start_line_offset=start_line,
+                )
             )
 
     root = tree.root_node

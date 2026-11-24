@@ -222,7 +222,7 @@ def run_evaluation(
         all_query_results.append(query_record)
 
     # Compute summary tables
-    key_metrics = ["Hit@1", "Hit@3", "Hit@5", "Recall@5", "Precision@5", "MRR", "nDCG@5"]
+    key_metrics = ["Hit@1", "Hit@3", "Hit@5", "ChunkMention@5", "ChunkHit@5", "Recall@5", "Precision@5", "MRR", "nDCG@5"]
 
     print("\n" + "=" * 80)
     print(f"BENCHMARK SUMMARY BY STAGE ({level.upper()}-LEVEL, MACRO-AVERAGE ACROSS ALL QUERIES)")

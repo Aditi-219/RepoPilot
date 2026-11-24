@@ -1,0 +1,4 @@
+# RepoPilot evaluation dependencies — install into the backend venv:
+#   cd backend && .venv\Scripts\pip install -r ..\evals\requirements.txt
+
+deepeval==4.3.4

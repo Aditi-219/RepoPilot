@@ -131,3 +131,21 @@ def test_chunk_file_ast_prepends_parent_symbol_signature():
     content = chunks[0].content
     assert "# File: backend/app/search.py" in content or "SearchPipeline" in content
 
+
+def test_chunk_file_ast_preserves_absolute_line_numbers_for_split_functions():
+    """When a large function or markdown section is split by tokens, absolute file line numbers must be preserved."""
+    preamble = "# preamble\n" * 50
+    func_body = "def large_computation():\n" + "".join(f"    v_{i} = {i} * 2\n" for i in range(100))
+    code = preamble + func_body
+
+    chunks = chunk_file("pipeline.py", code, chunk_size=50, overlap=10, strategy="ast")
+    assert len(chunks) > 1
+
+    # Find the chunk containing large_computation definition
+    def_chunk = next(c for c in chunks if "def large_computation" in c.content)
+    # Preamble was 50 lines, so function starts at line 51
+    assert def_chunk.start_line == 51
+    assert def_chunk.end_line >= 51
+
+
+
