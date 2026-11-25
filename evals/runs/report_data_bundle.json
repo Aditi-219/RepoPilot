@@ -1,0 +1,420 @@
+{
+  "run_id": "rag_triad_20261125_130722",
+  "dataset_stats": {
+    "total_rows": 32,
+    "evaluated_count": 26,
+    "skipped_count": 6
+  },
+  "judge_info": {
+    "run_judge_provider": "gemini",
+    "run_judge_model": "gemini-flash-lite-latest",
+    "run_judge_model_version_observed": "not_logged_in_130722"
+  },
+  "generator_info": {
+    "run_130722_generator_provider": null,
+    "run_130722_generator_model": null
+  },
+  "triad_summary": {
+    "context_relevancy": {
+      "mean": 0.4354,
+      "p50": 0.3902,
+      "std_dev": 0.1967,
+      "min": 0.1333,
+      "max": 0.9333,
+      "pass_rate": 0.0769,
+      "threshold": 0.7,
+      "n": 26
+    },
+    "chunk_file_precision": {
+      "mean": 0.4308,
+      "p50": 0.4,
+      "std_dev": 0.2168,
+      "min": 0.2,
+      "max": 1.0,
+      "pass_rate": 0.1154,
+      "threshold": 0.7,
+      "n": 26
+    },
+    "faithfulness": {
+      "mean": 0.9837,
+      "p50": 1.0,
+      "std_dev": 0.0671,
+      "min": 0.6667,
+      "max": 1.0,
+      "pass_rate": 0.9615,
+      "threshold": 0.7,
+      "n": 26
+    },
+    "answer_relevancy": {
+      "mean": 0.9676,
+      "p50": 1.0,
+      "std_dev": 0.1064,
+      "min": 0.5,
+      "max": 1.0,
+      "pass_rate": 0.9615,
+      "threshold": 0.7,
+      "n": 26
+    }
+  },
+  "faithfulness_audit": {
+    "total": 26,
+    "threshold_1_0_pass_count": 24,
+    "threshold_1_0_pass_rate": 0.9231,
+    "any_unsupported_claim_count": 2,
+    "any_unsupported_claim_pct": 7.7,
+    "unfaithful_rows": [
+      {
+        "id": "rp-009",
+        "score": 0.9091,
+        "reason": "The score is 0.91 because the actual output incorrectly claims that setting OLLAMA_MODEL=qwen2.5-coder:latest indicates a fallback to the Google Gemini API, whereas the context clearly states it makes RepoPilot prefer the local model."
+      },
+      {
+        "id": "rp-024",
+        "score": 0.6667,
+        "reason": "The score is 0.67 because the output incorrectly attributes the creation of the pgvector extension and LangGraph checkpoint tables to the initial migration, whereas the retrieval context states they are created by their respective libraries and the project relies on SQLAlchemy and raw SQL for schema setup."
+      }
+    ]
+  },
+  "flagged_cases_manual": [
+    {
+      "id": "rp-009",
+      "question": "How does RepoPilot decide whether to use local Ollama or cloud Gemini for RAG answer generation?",
+      "score": 0.9091,
+      "judge_flagged_claim": "The score is 0.91 because the actual output incorrectly claims that setting OLLAMA_MODEL=qwen2.5-coder:latest indicates a fallback to the Google Gemini API, whereas the context clearly states it makes RepoPilot prefer the local model.",
+      "answer": "RepoPilot decides whether to use local Ollama or cloud Gemini for RAG answer generation based on the following criteria:\n\n1. **Local Ollama Check**: RepoPilot first checks if a local Ollama model is installed and running. It does this by attempting to connect to the Ollama HTTP REST daemon at `http://localhost:11434`. If the connection is successful, RepoPilot uses the local model without hitting any daily rate limits.\n\n2. **Cloud Gemini Fallback**: If the local Ollama is not available, RepoPilot falls back to executing the RAG generation process via the Google Gemini API. This is indicated by the `ollama_model` environment variable being set to a specific model identifier, such as `qwen2.5-coder:latest`.\n\n3. **Model Preference**: The `OLLAMA_MODEL` environment variable is used to specify the preferred local model installed in Ollama. If this variable is not set, RepoPilot picks the first installed model.\n\n4. **Fallback Mechanism**: The `GEMINI_MODEL` environment variable is used to specify the Google Gemini model identifier used for generation. If this variable is not set, RepoPilot defaults to using the `gemini-3.5-flash-lite` model.\n\n5. **Fallback Timeout**: The decision to use the local Ollama or cloud Gemini API is made with a timeout of 3.0 seconds, ensuring that the process does not hang indefinitely if the local Ollama is not available.\n\nThe code snippet at `backend/app/llm_service.py:L153-L166` provides a clear example of how RepoPilot checks for the local Ollama and handles the fallback to the cloud Gemini API based on the specified environment variables.",
+      "retrieval_context": [
+        "File: backend/app/llm_service.py (lines 1-21)\n\"\"\"LLM integration for RepoPilot Phase 3 RAG Q&A.\n\nSupports both:\n1. Ollama (100% local, free, unlimited, private, no API key needed).\n2. Google Gemini / Generative Language API (cloud-based).\n\nIf an Ollama model is installed locally (e.g. qwen2.5-coder, llama3.2),\nRepoPilot automatically uses it without hitting any daily rate limits.\n\"\"\"\nimport logging\nimport os\nimport httpx\nfrom app.search import SearchResult\nlogger = logging.getLogger(__name__)\nOLLAMA_BASE_URL = os.getenv(\"OLLAMA_BASE_URL\", \"http://localhost:11434\")\nPREFERRED_OLLAMA_MODEL = os.getenv(\"OLLAMA_MODEL\", \"\")\nCANDIDATE_GEMINI_MODELS = [\n    \"gemini-3.5-flash-lite\",\n    \"gemini-3.8-flash\",\n    \"gemini-flash-latest\",\n    \"gemma-4-26b-a4b-it\",",
+        "File: docs/16-setup-and-local-development.md (lines 134-149)\n### Step 4 (Optional): Local Ollama AI Setup\n\nTo run Q&A without any external API keys or cloud quotas:\n1. Install Ollama from [ollama.com](https://ollama.com).\n2. Pull a high-performance coding model:\n   ```bash\n   ollama pull qwen2.5-coder:latest\n   ```\n3. Verify Ollama is running:\n   ```bash\n   curl http://localhost:11434/api/tags\n   ```\n4. Set `OLLAMA_MODEL=qwen2.5-coder:latest` in `backend/.env`. RepoPilot will now automatically prefer your local model for RAG generation.\n\n---",
+        "File: docs/01-project-overview.md (lines 68-72)\n4. **Direct RAG Q&A Endpoint**:\n   - `POST /api/repositories/{id}/ask` with context construction and automated dual-provider generation (local Ollama primary, Google Gemini secondary) in [rag.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/routers/rag.py) and [llm_service.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/llm_service.py).\n5. **Agentic Workflows via LangGraph**:\n   - StateGraph compilation with `AgentState` schema, `agent` node, prebuilt `ToolNode`, and conditional `tools_condition` edge routing ([graph.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/agent/graph.py)).\n   - Tool suite: `fetch_repo_metadata`, `inspect_file_tree`, `read_source_file` with bound parameter validation ([github_tools.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/tools/github_tools.py)).",
+        "File: docs/20-resume-and-interview-preparation.md (lines 43-50)\n### 3. Dual LLM Provider Support (Local Ollama + Google Gemini Cloud)\n- **Decision**: Implemented an automated fallback: check local Ollama at `localhost:11434` (timeout 3.0s); if offline, execute via Google Gemini API.\n- **Trade-Off**: Maintaining two client integration paths.\n- **Justification**: Enables 100% private, free, and unlimited local development for developers with Ollama, while providing cloud reliability for users without local GPU hardware.\n- **Evidence**: [backend/app/llm_service.py:L153-L166](file:///c:/Users/nehad/Project/RepoPilot/backend/app/llm_service.py#L153-L166).\n\n---",
+        "File: docs/16-setup-and-local-development.md (lines 34-37)\n| `GEMINI_MODEL` | Google Gemini model identifier used for generation | No | `gemini-3.5-flash-lite` | [graph.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/agent/graph.py) |\n| `OLLAMA_BASE_URL` | Endpoint for local Ollama HTTP REST daemon | No | `http://localhost:11434` | [llm_service.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/llm_service.py) |\n| `OLLAMA_MODEL` | Preferred local model name installed in Ollama | No | `\"\"` (picks first installed model) | [llm_service.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/llm_service.py) |\n| `LANGSMITH_TRACING` | Enable LangSmith telemetry and agent workflow execution tracing | No | `false` | LangChain Core runtime |"
+      ],
+      "review_status": "judge-flagged, pending human review"
+    },
+    {
+      "id": "rp-024",
+      "question": "Where are the initial database tables and pgvector extension created in the Alembic migrations?",
+      "score": 0.6667,
+      "judge_flagged_claim": "The score is 0.67 because the output incorrectly attributes the creation of the pgvector extension and LangGraph checkpoint tables to the initial migration, whereas the retrieval context states they are created by their respective libraries and the project relies on SQLAlchemy and raw SQL for schema setup.",
+      "answer": "The initial database tables and pgvector extension are created in the Alembic migration script `b71dccb6d03d_initial_schema.py` located at `backend/alembic/versions/b71dccb6d03d_initial_schema.py`. This script is executed when the database is initialized or upgraded using Alembic.",
+      "retrieval_context": [
+        "File: backend/alembic/versions/b71dccb6d03d_initial_schema.py (lines 1-26)\n\"\"\"initial_schema\n\nRevision ID: b71dccb6d03d\nRevises:\nCreate Date: 2026-10-29 16:21:29.839377\n\nThis is the baseline migration for RepoPilot. It captures the schema that was\npreviously created by SQLAlchemy's Base.metadata.create_all(). Existing\ndatabases should be stamped at this revision with:\n\n    alembic stamp b71dccb6d03d\n\nFresh installs should run the full upgrade:\n\n    alembic upgrade head\n\nNote: The pgvector extension and LangGraph checkpoint tables (checkpoints,\ncheckpoint_blobs, checkpoint_writes, checkpoint_migrations) are created by\ntheir respective libraries, not by this migration.\n\"\"\"\nfrom typing import Sequence, Union\nimport sqlalchemy as sa\nfrom alembic import op\nfrom pgvector.sqlalchemy import Vector\n# revision identifiers, used by Alembic.\nrevision: str = \"b71dccb6d03d\"",
+        "File: docs/09-database-and-data-model.md (lines 151-159)\n## 5. Schema Migration & Code Mismatch Audit\n\n1. **Absence of Alembic Migrations**:\n   - The project currently relies on SQLAlchemy's `Base.metadata.create_all(bind=engine)` and raw SQL index statements in `app/main.py::lifespan`.\n   - **Risk**: `create_all` does not alter existing columns or handle schema migrations when columns change in production.\n2. **PostgreSQL Extension Dependency**:\n   - `models.py` imports `from pgvector.sqlalchemy import Vector`. The target PostgreSQL database must have the `vector` extension installed (`CREATE EXTENSION IF NOT EXISTS vector;`). On Windows, [install_pgvector.bat](file:///c:/Users/nehad/Project/RepoPilot/install_pgvector.bat) is provided to copy compiled binaries into PostgreSQL 18.\n3. **Session Consistency**:\n   - Long-running background ingestion in `indexer.py` uses an isolated `SessionLocal()` rather than the request-scoped session from `get_db()`. This correctly avoids connection timeout leaks when HTTP requests complete while indexing continues.",
+        "File: docs/18-known-limitations-and-technical-debt.md (lines 24-36)\n### 1. Absence of Database Migration Tool (Alembic)\n- **What**: The database relies on `Base.metadata.create_all(bind=engine)` inside `app/main.py::lifespan` on server startup.\n- **Why It Is Technical Debt**:\n  - `create_all` only creates tables if they do not exist.\n  - If a column is added, renamed, or modified (e.g., adding an `author_id` foreign key to `Repository`), `create_all` silently does nothing.\n  - Modifying schemas currently requires dropping tables or writing manual SQL scripts in `psql`.\n- **Remediation**:\n  - Initialize Alembic: `alembic init alembic`.\n  - Configure `env.py` to import `Base.metadata` from `app.database`.\n  - Generate versioned migration scripts: `alembic revision --autogenerate -m \"initial schema\"`.\n\n---",
+        "File: docs/02-feature-inventory.md (lines 23-24)\n| **Database Migrations (Alembic)** | Implemented & verified in code | [alembic.ini](file:///c:/Users/nehad/Project/RepoPilot/backend/alembic.ini), [alembic/env.py](file:///c:/Users/nehad/Project/RepoPilot/backend/alembic/env.py), [b71dccb6d03d_initial_schema.py](file:///c:/Users/nehad/Project/RepoPilot/backend/alembic/versions/b71dccb6d03d_initial_schema.py) | `alembic`, `SQLAlchemy`, `pgvector` | Version-controlled DDL migrations; tracks schema revisions, pgvector extension, HNSW, and GIN indexes. |\n| **GitHub Actions CI/CD** | Implemented & verified in code | [ci.yml](file:///c:/Users/nehad/Project/RepoPilot/.github/workflows/ci.yml) | GitHub Actions, `pgvector/pgvector:pg17` container | Dual-job CI pipeline: backend pytest + ruff linting, frontend oxlint + production Vite build. |",
+        "File: docs/04-repository-structure.md (lines 3-20)\n## 1. Complete Repository Directory Tree\n\n```\nRepoPilot/\n\u251c\u2500\u2500 .agents/\n\u2502   \u2514\u2500\u2500 rules/\n\u2502       \u251c\u2500\u2500 architecture.md           # Architectural rules for agentic changes\n\u2502       \u251c\u2500\u2500 coding-standards.md       # Naming, typing, and style conventions\n\u2502       \u251c\u2500\u2500 security.md               # Secrets, SSRF, untrusted content rules\n\u2502       \u2514\u2500\u2500 testing-and-quality.md    # Quality gate instructions\n\u251c\u2500\u2500 .github/\n\u2502   \u2514\u2500\u2500 workflows/\n\u2502       \u2514\u2500\u2500 ci.yml                    # Automated CI workflow (pgvector, pytest, ruff, oxlint, build)\n\u251c\u2500\u2500 backend/\n\u2502   \u251c\u2500\u2500 alembic/                      # Alembic schema migrations directory\n\u2502   \u2502   \u251c\u2500\u2500 env.py                    # Migration execution environment & metadata target\n\u2502   \u2502   \u2514\u2500\u2500 versions/\n\u2502   \u2502       \u2514\u2500\u2500 b71dccb6d03d_initial_schema.py # Initial baseline migration (tables, HNSW, GIN)"
+      ],
+      "review_status": "judge-flagged, pending human review"
+    }
+  ],
+  "contextual_metrics_clean": {
+    "contextual_precision": {
+      "n_valid": 25,
+      "n_error": 1,
+      "errors": [
+        {
+          "id": "rp-001",
+          "status": "evaluation_error",
+          "reason": "Evaluation LLM outputted an invalid JSON. Please use a better evaluation model."
+        }
+      ],
+      "mean": 0.7644,
+      "p50": 0.8333,
+      "pass_rate": 0.76,
+      "pass_count": 19
+    },
+    "contextual_recall": {
+      "n_valid": 24,
+      "n_error": 2,
+      "errors": [
+        {
+          "id": "rp-004",
+          "status": "evaluation_error",
+          "reason": "Evaluation LLM outputted an invalid JSON. Please use a better evaluation model."
+        },
+        {
+          "id": "rp-015",
+          "status": "evaluation_error",
+          "reason": "Evaluation LLM outputted an invalid JSON. Please use a better evaluation model."
+        }
+      ],
+      "mean": 0.6667,
+      "p50": 1.0,
+      "pass_rate": 0.6667,
+      "pass_count": 16,
+      "lt_1_valid": [
+        {
+          "id": "rp-008",
+          "score": 0.0,
+          "reason": "The score is 0.00 because none of the information regarding the agent checking the recursion step against the recursion_",
+          "gt_files": [
+            "backend/app/agent/graph.py",
+            "docs/10-langgraph-and-agent-workflows.md",
+            "docs/03-architecture.md"
+          ],
+          "retrieved_files": [
+            "docs/20-resume-and-interview-preparation.md",
+            "docs/19-developer-learning-guide.md",
+            "docs/10-langgraph-and-agent-workflows.md",
+            "docs/03-architecture.md",
+            "docs/02-feature-inventory.md"
+          ],
+          "missing_gt_files": [
+            "backend/app/agent/graph.py"
+          ]
+        },
+        {
+          "id": "rp-013",
+          "score": 0.0,
+          "reason": "The score is 0.00 because the retrieval context lacks the necessary implementation details regarding the GitHub Contents",
+          "gt_files": [
+            "backend/app/tools/github_tools.py",
+            "backend/app/github_service.py",
+            "docs/12-github-and-mcp-integration.md"
+          ],
+          "retrieved_files": [
+            "backend/app/tools/github_tools.py",
+            "backend/app/agent/graph.py",
+            "backend/app/github_service.py",
+            "docs/20-resume-and-interview-preparation.md",
+            "backend/app/agent/prompts.py"
+          ],
+          "missing_gt_files": [
+            "docs/12-github-and-mcp-integration.md"
+          ]
+        },
+        {
+          "id": "rp-014",
+          "score": 0.0,
+          "reason": "The score is 0.00 because the sentence regarding `init_checkpointer` establishing a pool and its initialization during s",
+          "gt_files": [
+            "backend/app/agent/checkpoint.py",
+            "backend/app/main.py",
+            "backend/app/routers/chat.py",
+            "docs/10-langgraph-and-agent-workflows.md"
+          ],
+          "retrieved_files": [
+            "docs/05-technology-stack.md",
+            "backend/app/agent/checkpoint.py",
+            "backend/app/main.py",
+            "docs/10-langgraph-and-agent-workflows.md",
+            "frontend/src/components/ChatView.tsx"
+          ],
+          "missing_gt_files": [
+            "backend/app/routers/chat.py"
+          ]
+        },
+        {
+          "id": "rp-017",
+          "score": 0.0,
+          "reason": "The score is 0.00 because the expected output regarding `agent_node` in `backend/app/agent/graph.py` handling interrupte",
+          "gt_files": [
+            "backend/app/agent/graph.py",
+            "docs/10-langgraph-and-agent-workflows.md",
+            "docs/14-security-and-error-handling.md"
+          ],
+          "retrieved_files": [
+            "backend/tests/test_agent_graph.py",
+            "backend/tests/test_agent_graph.py",
+            "docs/20-resume-and-interview-preparation.md",
+            "docs/10-langgraph-and-agent-workflows.md",
+            "docs/10-langgraph-and-agent-workflows.md"
+          ],
+          "missing_gt_files": [
+            "backend/app/agent/graph.py",
+            "docs/14-security-and-error-handling.md"
+          ]
+        },
+        {
+          "id": "rp-024",
+          "score": 0.0,
+          "reason": "The score is 0.00 because the entire expected output regarding the upgrade function creating the vector extension and ta",
+          "gt_files": [
+            "backend/alembic/versions/b71dccb6d03d_initial_schema.py",
+            "docs/09-database-and-data-model.md"
+          ],
+          "retrieved_files": [
+            "backend/alembic/versions/b71dccb6d03d_initial_schema.py",
+            "docs/09-database-and-data-model.md",
+            "docs/18-known-limitations-and-technical-debt.md",
+            "docs/02-feature-inventory.md",
+            "docs/04-repository-structure.md"
+          ],
+          "missing_gt_files": []
+        },
+        {
+          "id": "rp-026",
+          "score": 0.0,
+          "reason": "The score is 0.00 because the mention of the RepositoryCreate schema in backend/app/schemas.py validating URL formatting",
+          "gt_files": [
+            "backend/app/schemas.py",
+            "backend/app/github_service.py",
+            "docs/08-backend-and-api-reference.md"
+          ],
+          "retrieved_files": [
+            "backend/app/routers/repositories.py",
+            "docs/02-feature-inventory.md",
+            "backend/app/github_service.py",
+            "docs/04-repository-structure.md",
+            "docs/20-resume-and-interview-preparation.md"
+          ],
+          "missing_gt_files": [
+            "backend/app/schemas.py",
+            "docs/08-backend-and-api-reference.md"
+          ]
+        },
+        {
+          "id": "rp-027",
+          "score": 0.0,
+          "reason": "The score is 0.00 because the specific file path 'backend/app/agent/state.py' and details regarding 'repository_id', 'se",
+          "gt_files": [
+            "backend/app/agent/state.py",
+            "docs/10-langgraph-and-agent-workflows.md"
+          ],
+          "retrieved_files": [
+            "docs/03-architecture.md",
+            "docs/03-architecture.md",
+            "docs/10-langgraph-and-agent-workflows.md",
+            "backend/app/agent/graph.py",
+            "docs/02-feature-inventory.md"
+          ],
+          "missing_gt_files": [
+            "backend/app/agent/state.py"
+          ]
+        },
+        {
+          "id": "rp-028",
+          "score": 0.0,
+          "reason": "The score is 0.00 because the 1st node in the retrieval context only partially covers the expected output by mentioning ",
+          "gt_files": [
+            "backend/app/routers/helpers.py",
+            "docs/14-security-and-error-handling.md"
+          ],
+          "retrieved_files": [
+            "backend/app/routers/helpers.py",
+            "docs/02-feature-inventory.md",
+            "docs/18-known-limitations-and-technical-debt.md",
+            "backend/app/routers/rag.py",
+            "docs/02-feature-inventory.md"
+          ],
+          "missing_gt_files": [
+            "docs/14-security-and-error-handling.md"
+          ]
+        }
+      ]
+    }
+  },
+  "unified_recall_table": {
+    "baseline_top_k_5": {
+      "binary_hit": 1.0,
+      "multi_target_recall": 0.641,
+      "mean_chunks": 5
+    },
+    "top_k_4": {
+      "binary_hit": 1.0,
+      "multi_target_recall": 0.5865,
+      "mean_chunks": 4
+    },
+    "top_k_3": {
+      "binary_hit": 0.9231,
+      "multi_target_recall": 0.516,
+      "mean_chunks": 3
+    },
+    "cutoff_1.0_keep_1": {
+      "binary_hit": 0.9231,
+      "multi_target_recall": 0.5321,
+      "mean_chunks": 3.81
+    },
+    "cutoff_2.0_keep_1": {
+      "binary_hit": 0.8462,
+      "multi_target_recall": 0.4679,
+      "mean_chunks": 3.12
+    },
+    "cutoff_3.0_keep_1": {
+      "binary_hit": 0.7692,
+      "multi_target_recall": 0.3974,
+      "mean_chunks": 2.38
+    }
+  },
+  "retriever_k50_reranked": {
+    "hit_at_5": 1.0,
+    "recall_at_5": 0.5994
+  },
+  "eye_inspection_samples": [
+    {
+      "id": "rp-001",
+      "question": "Where is Reciprocal Rank Fusion (RRF) implemented to combine semantic and keyword search rankings?",
+      "answer": "Reciprocal Rank Fusion (RRF) is implemented in the `backend/app/search.py` file, specifically in the `_rrf_fusion` function, which is called within the `hybrid_search` function. The function takes in semantic and keyword results, along with a constant `k`, and returns a list of `SearchResult` objects that have been RRF-scored. The RRF score is calculated by summing the reciprocal rank positions of each document across both result lists, with a smoothing constant `k`.",
+      "retrieval_context": [
+        "File: backend/app/search.py (lines 193-215)\ndef _rrf_fusion(\n    semantic_results: list[dict],\n    keyword_results: list[dict],\n    k: int = RRF_K,\n) -> list[SearchResult]:\n    \"\"\"Fuse semantic and keyword rankings via Reciprocal Rank Fusion.\n\n    RRF is rank-based: it does not require semantic distances and FTS scores\n    to be on the same scale. Each document's score is the sum of its\n    reciprocal rank positions across both result lists:\n\n        score(d) = \u03a3_i  1 / (k + rank_i(d))\n\n    Documents absent from a list receive no contribution from that list.\n\n    Args:\n        semantic_results: Rows from _semantic_search() (ordered by similarity).\n        keyword_results:  Rows from _keyword_search() (ordered by ts_rank).\n        k:                RRF constant (standard default: 60).\n\n    Returns:\n        Merged, RRF-ranked list of SearchResult objects.\n    \"\"\"",
+        "File: docs/04-repository-structure.md (lines 207-217)\n- **Purpose**: Implements hybrid code retrieval combining dense vector similarity and sparse full-text search fused with Reciprocal Rank Fusion (RRF).\n- **Key Symbols**:\n  - `SearchResult`: Dataclass for retrieved candidates.\n  - `_semantic_search()`: Executes SQL with pgvector `<=>` cosine distance against HNSW index.\n  - `_keyword_search()`: Executes SQL with PostgreSQL full-text search (`tsvector @@ plainto_tsquery`) against GIN index.\n  - `_rrf_fusion()`: Combines dense and sparse rankings with $k=60$.\n  - `hybrid_search()`: Orchestrator function embedding the query, executing both retrievers, and fusing rankings.\n  - `rerank()` in `reranker.py`: Deduplicates candidates by `(file_path, start_line, end_line)` and slices top-k.\n- **Dependencies**: `sqlalchemy`, `app.embedder`.\n- **Callers**: `rag.py`.\n- **Status**: Main execution path (critical).",
+        "File: docs/20-resume-and-interview-preparation.md (lines 140-145)\n### 11. Explain how Reciprocal Rank Fusion (RRF) works mathematically.\n- **Answer**:\n  Given a set of documents $D$ and retrieval rankings from semantic search $R_{\\text{sem}}$ and keyword search $R_{\\text{kw}}$, the RRF score is:\n  $$\\text{RRF}(d) = \\sum_{m \\in \\{\\text{sem}, \\text{kw}\\}} \\frac{1}{k + r_m(d)}$$\n  where $k=60$ is a smoothing constant, and $r_m(d)$ is the 1-indexed rank position of document $d$. RRF relies purely on rank order rather than raw score magnitudes, eliminating the need to normalize disparate cosine distances and BM25/ts_rank values.\n- **Source**: [backend/app/search.py:L156-L210](file:///c:/Users/nehad/Project/RepoPilot/backend/app/search.py#L156-L210).",
+        "File: backend/app/search.py (lines 1-20)\n\"\"\"Hybrid retrieval engine for RepoPilot Phase 3.\n\nCombines semantic search (pgvector cosine similarity) and full-text search\n(PostgreSQL tsvector/tsquery) via Reciprocal Rank Fusion (RRF).\n\nPipeline:\n  1. Embed the query -> 384-dim vector via the same BERT model used at index time\n  2. Semantic search  -> top-N chunks by cosine distance  (embedding <=> query_vec)\n  3. Full-text search -> top-N chunks by ts_rank          (tsvector @@ tsquery)\n  4. RRF fusion       -> single ranked list without needing score normalization\n\nReference: Cormack, Clarke & Buettcher (2009) - \"Reciprocal Rank Fusion\noutperforms Condorcet and individual Rank Learning Methods\"\n\"\"\"\nimport logging\nimport re\nfrom dataclasses import dataclass, field\nfrom typing import Any\nfrom sqlalchemy import text\nfrom sqlalchemy.orm import Session",
+        "File: docs/13-rag-and-code-retrieval.md (lines 95-103)\n### Mathematical Formulation of RRF ([search.py:L156-L210](file:///c:/Users/nehad/Project/RepoPilot/backend/app/search.py#L156-L210))\nReciprocal Rank Fusion merges rankings without requiring arbitrary calibration or normalization between cosine distances ($[0, 2]$) and full-text rank scores ($[0, \\infty)$):\n\n$$\\text{RRF\\_Score}(d) = \\sum_{m \\in \\{\\text{semantic}, \\text{keyword}\\}} \\frac{1}{k + r_m(d)}$$\n\n- **$k = 60$**: Standard empirically proven smoothing constant.\n- **$r_m(d)$**: 1-indexed rank position of document $d$ within retrieval list $m$.\n- If a document appears in both lists, its score is boosted significantly, elevating documents that satisfy both semantic context and exact keyword matching to the top of the context window."
+      ],
+      "context_relevancy_score": 0.5217,
+      "faithfulness_score": 1.0,
+      "answer_relevancy_score": 1.0
+    },
+    {
+      "id": "rp-002",
+      "question": "Where is the neural cross-encoder model loaded and invoked for candidate reranking?",
+      "answer": "The neural cross-encoder model is loaded and invoked for candidate reranking in the `rerank` function of `reranker.py`, lines 118\u2013143. The function `_neural_rerank` attempts to load the cross-encoder model using `sentence-transformers` and scores each `(query, chunk)` pair through the cross-encoder model. If the model is unavailable, it falls back to the heuristic mode.",
+      "retrieval_context": [
+        "File: backend/app/reranker.py (lines 13-30)\n\nSet ENABLE_NEURAL_RERANKER=true in your .env to activate neural reranking.\n\"\"\"\nimport logging\nimport os\nfrom dotenv import load_dotenv\nfrom app.search import SearchResult\n# Ensure backend .env is loaded\nload_dotenv(os.path.join(os.path.dirname(__file__), \"..\", \".env\"))\nload_dotenv()\nlogger = logging.getLogger(__name__)\n# Read once at module load; avoids re-reading the env var on every call.\n_NEURAL_RERANKER_ENABLED: bool = os.getenv(\"ENABLE_NEURAL_RERANKER\", \"false\").lower() == \"true\"\n# Model name for the cross-encoder. This is a small, fast model that works well\n# for code retrieval tasks (trained on MS MARCO passage ranking).\n_CROSS_ENCODER_MODEL = \"cross-encoder/ms-marco-MiniLM-L-6-v2\"\n# Lazy-loaded cross-encoder \u2014 only initialised when neural mode is first used.\n_cross_encoder = None",
+        "File: docs/13-rag-and-code-retrieval.md (lines 104-110)\n### C. Precision Reranking ([reranker.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/reranker.py))\nFollowing RRF candidate fusion, RepoPilot passes the top candidates to `rerank(query, results, top_k)`:\n1. **Heuristic Deduplication (Default)**: Deduplicates overlapping chunks by `(file_path, start_line, end_line)` tuple and preserves RRF rank order without added latency.\n2. **Neural Cross-Encoder Mode (Opt-in via `ENABLE_NEURAL_RERANKER=true`)**: Lazily loads `cross-encoder/ms-marco-MiniLM-L-6-v2` via `sentence-transformers`. Evaluates full cross-attention over `(query, code_snippet)` token pairs, scoring each candidate with a true relevance logit. Re-sorts candidates to maximize precision before feeding them into the LLM context window.\n\n---",
+        "File: backend/app/reranker.py (lines 1-19)\n\"\"\"Reranker module for RepoPilot Phase 3 RAG pipeline.\n\nOrders retrieved candidates for precision. Supports two modes:\n\n- **Heuristic mode** (default): fast deduplication + RRF rank order preserved.\n  Suitable for local CPU-only setups with no extra dependencies.\n\n- **Neural mode** (opt-in via ENABLE_NEURAL_RERANKER=true): scores each\n  (query, chunk) pair through a cross-encoder model\n  (cross-encoder/ms-marco-MiniLM-L-6-v2) and re-sorts by the raw logit score.\n  Requires sentence-transformers >= 2.2 and sufficient RAM/CPU (or GPU).\n  Adds ~200\u2013500 ms latency on CPU for a set of 20 candidates.\n\nSet ENABLE_NEURAL_RERANKER=true in your .env to activate neural reranking.\n\"\"\"\nimport logging\nimport os\nfrom dotenv import load_dotenv\nfrom app.search import SearchResult",
+        "File: backend/app/reranker.py (lines 118-143)\ndef _neural_rerank(\n    query: str,\n    candidates: list[SearchResult],\n    top_k: int,\n) -> list[SearchResult]:\n    \"\"\"Score candidates with a cross-encoder and return the top-k by score.\n\n    Args:\n        query:      The user's search query.\n        candidates: Pre-filtered list of SearchResult objects to score.\n        top_k:      Maximum number of results to return.\n\n    Returns:\n        Candidates sorted by descending cross-encoder logit score, truncated to top_k.\n        Falls back to heuristic ordering if the model is unavailable.\n    \"\"\"\n    encoder = _get_cross_encoder()\n    if encoder is None:\n        logger.warning(\"Cross-encoder unavailable; falling back to heuristic reranking.\")\n        return candidates[:top_k]\n\n    pairs = [(query, r.content) for r in candidates]\n    try:\n        scores = encoder.predict(pairs)\n    except Exception as exc:\n        logger.warning(\"Cross-encoder prediction failed (falling back): %s\", exc)",
+        "File: docs/18-known-limitations-and-technical-debt.md (lines 59-67)\n### 4. Cross-Encoder Reranker Heuristic Placeholder\n- **What**: [backend/app/reranker.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/reranker.py) currently performs deduplication by `(file_path, start_line, end_line)` and returns the top-k results from RRF ranking rather than running a neural cross-encoder.\n- **Why It Exists**:\n  - Neural cross-encoders (e.g., `cross-encoder/ms-marco-MiniLM-L-6-v2`) require heavy inference compute per pair $(q, d_i)$, which adds 1.5\u20133.0s latency per search on local developer CPUs.\n- **Remediation**:\n  - Implement an optional cross-encoder path guarded by an environment variable (`ENABLE_NEURAL_RERANKER=true`), leaving fast RRF as the high-speed default.\n\n---"
+      ],
+      "context_relevancy_score": 0.4286,
+      "faithfulness_score": 1.0,
+      "answer_relevancy_score": 1.0
+    },
+    {
+      "id": "rp-003",
+      "question": "Where are the HNSW vector cosine distance index and full-text search GIN index created in the database?",
+      "answer": "The HNSW vector cosine distance index and full-text search GIN index are created in the database using the following SQL commands:\n\n```sql\nCREATE INDEX IF NOT EXISTS idx_code_chunks_embedding_hnsw\nON code_chunks\nUSING hnsw (embedding vector_cosine_ops)\nWITH (m = 16, ef_construction = 64);\n```\n\n```sql\nCREATE INDEX IF NOT EXISTS idx_code_chunks_content_gin\nON code_chunks\nUSING gin(to_tsvector('english', content));\n```\n\nThese commands are executed in the `backend/app/main.py` file, lines 67-71, as shown in the provided code snippet.",
+      "retrieval_context": [
+        "File: docs/04-repository-structure.md (lines 207-217)\n- **Purpose**: Implements hybrid code retrieval combining dense vector similarity and sparse full-text search fused with Reciprocal Rank Fusion (RRF).\n- **Key Symbols**:\n  - `SearchResult`: Dataclass for retrieved candidates.\n  - `_semantic_search()`: Executes SQL with pgvector `<=>` cosine distance against HNSW index.\n  - `_keyword_search()`: Executes SQL with PostgreSQL full-text search (`tsvector @@ plainto_tsquery`) against GIN index.\n  - `_rrf_fusion()`: Combines dense and sparse rankings with $k=60$.\n  - `hybrid_search()`: Orchestrator function embedding the query, executing both retrievers, and fusing rankings.\n  - `rerank()` in `reranker.py`: Deduplicates candidates by `(file_path, start_line, end_line)` and slices top-k.\n- **Dependencies**: `sqlalchemy`, `app.embedder`.\n- **Callers**: `rag.py`.\n- **Status**: Main execution path (critical).",
+        "File: backend/app/main.py (lines 69-91)\n                ON code_chunks\n                USING hnsw (embedding vector_cosine_ops)\n                WITH (m = 16, ef_construction = 64)\n            \"\"\"))\n            conn.execute(text(\"\"\"\n                CREATE INDEX IF NOT EXISTS idx_code_chunks_content_gin\n                ON code_chunks\n                USING gin(to_tsvector('english', content))\n            \"\"\"))\n            conn.commit()\n        logger.info(\"Database search indexes (HNSW + GIN) verified.\")\n    except Exception as exc:\n        # Non-fatal: search will still function with sequential table scans\n        logger.warning(\"Could not create search indexes (non-fatal): %s\", exc)\n\n    # 3. Initialize LangGraph durable checkpointer\n    await init_checkpointer()\n\n    yield\n\n    # Shutdown checkpointer connections\n    await close_checkpointer()\n    logger.info(\"Shutting down RepoPilot API...\")",
+        "File: docs/20-resume-and-interview-preparation.md (lines 163-169)\n### 14. What is the purpose of HNSW indexes in pgvector?\n- **Answer**:\n  Hierarchical Navigable Small World (HNSW) is a graph-based index for Approximate Nearest Neighbor (ANN) search. Without an index, vector similarity queries require exhaustive sequential table scans ($O(N)$). HNSW enables logarithmic time complexity ($O(\\log N)$) cosine search across high-dimensional vectors. RepoPilot creates it via `USING hnsw (embedding vector_cosine_ops) WITH (m = 16, ef_construction = 64)`.\n- **Source**: [backend/app/main.py:L67-L71](file:///c:/Users/nehad/Project/RepoPilot/backend/app/main.py#L67-L71).\n\n---",
+        "File: docs/01-project-overview.md (lines 63-67)\n3. **Hybrid Code Retrieval & Cross-Ranking**:\n   - Dense vector cosine similarity via `pgvector` operator `<=>` leveraging PostgreSQL HNSW indexes ([search.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/search.py#L55-L101)).\n   - Sparse full-text keyword search via PostgreSQL `tsvector` and `plainto_tsquery` leveraging GIN indexes ([search.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/search.py#L103-L154)).\n   - Reciprocal Rank Fusion (RRF with $k=60$) combining semantic and lexical rankings ([search.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/search.py#L156-L210)).\n   - **Dual-Mode Precision Reranking**: Fast heuristic RRF deduplication by default, with opt-in **Neural Cross-Encoder** (`cross-encoder/ms-marco-MiniLM-L-6-v2`) scoring via `ENABLE_NEURAL_RERANKER=true` in [reranker.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/reranker.py#L25-L137).",
+        "File: docs/03-architecture.md (lines 12-18)\n   - **Hybrid Retrieval Engine**: Dual-channel retrieval fusing dense pgvector cosine similarity with sparse PostgreSQL full-text search via Reciprocal Rank Fusion (RRF).\n   - **LangGraph Agent Workflow**: Cyclic directed state graph executing autonomous tool calls, LLM reasoning, and durable checkpoint persistence.\n4. **Data & Vector Storage Tier (PostgreSQL 18 + pgvector)**: Single unified relational engine hosting structured entities (`repositories`, `code_chunks`, `chat_sessions`), vector embeddings with HNSW indexing, full-text inverted indexes with GIN indexing, and LangGraph checkpointer state.\n5. **External Intelligence & Provider Tier**: GitHub REST API v3, local Ollama LLM server, Google Gemini Cloud LLM, and LangSmith observability.\n\n---"
+      ],
+      "context_relevancy_score": 0.3529,
+      "faithfulness_score": 1.0,
+      "answer_relevancy_score": 0.8
+    },
+    {
+      "id": "rp-004",
+      "question": "Where is Tree-sitter AST parsing configured to extract classes, functions, and methods for chunking?",
+      "answer": "Tree-sitter AST parsing is configured to extract classes, functions, and methods for chunking in the `chunk_file_ast` function within the `chunker.py` file. This function uses the `tree-sitter` parser to identify syntactic boundaries and then processes the parsed AST to separate complete functions and classes into coherent units. The `CHUNK_STRATEGY` variable is set to `\"ast\"` by default, which means the function will use Tree-sitter to parse the source code and extract the required information.",
+      "retrieval_context": [
+        "File: docs/01-project-overview.md (lines 60-62)\n   - **Tree-sitter AST Symbol Chunking**: Syntax-tree aware splitting extracting complete functions, classes, and methods via `tree-sitter` and `tree-sitter-python`, with token-bounded sliding window and heading splitters fallback ([chunker.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/chunker.py#L252-L473)).\n   - Local dense neural vector embeddings via HuggingFace `sentence-transformers/all-MiniLM-L6-v2` (384 dimensions) with PyTorch mean pooling and L2 normalization ([embedder.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/embedder.py)).\n   - Bulk database insertion with asynchronous batching (`BATCH_SIZE = 64`) and repository lifecycle state tracking (`pending` -> `indexing` -> `completed` / `failed`) in [indexer.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/indexer.py).",
+        "File: docs/13-rag-and-code-retrieval.md (lines 44-51)\n### B. RepoPilot's Multi-Strategy Chunking Implementation ([chunker.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/chunker.py))\n\n#### 1. Code Files: Tree-sitter AST-Aware Chunking (`chunk_file_ast`)\n- Controlled via `CHUNK_STRATEGY` (default: `\"ast\"`, can be toggled to `\"tokens\"`).\n- Integrates `tree-sitter` and `tree-sitter-python` to parse Concrete Syntax Trees (CST).\n- **Function and Class Isolation**: Identifies `function_definition`, `class_definition`, and `decorated_definition` nodes. Complete functions that fit within `CHUNK_SIZE_TOKENS` remain intact as atomic units.\n- **Large Class Decomposition**: When a class exceeds token bounds, its preamble (header and docstring) is emitted, followed by each constituent method as a standalone chunk.\n- **Preamble & Imports Coalescing**: Imports and module-level constants are accumulated and emitted as structured preamble chunks.",
+        "File: backend/app/chunker.py (lines 303-328)\ndef chunk_file_ast(\n    file_path: str,\n    content: str,\n    language: str | None,\n    chunk_size: int = DEFAULT_CHUNK_SIZE,\n    overlap: int = DEFAULT_CHUNK_OVERLAP,\n) -> list[Chunk]:\n    \"\"\"Split source code into AST-aware chunks (classes, functions, methods).\n\n    Uses Tree-sitter to identify syntactic boundaries. Complete functions and\n    classes that fit within `chunk_size` are preserved as coherent units.\n    Large definitions are broken down into methods or token-bounded segments.\n\n    Args:\n        file_path:  Relative file path for metadata.\n        content:    Raw source text.\n        language:   Detected language name.\n        chunk_size: Maximum tokens per chunk.\n        overlap:    Overlap tokens when falling back to sliding window.\n\n    Returns:\n        List of Chunk objects.\n    \"\"\"\n    lines = content.splitlines(keepends=True)\n    parser = _get_tree_sitter_parser(language)",
+        "File: docs/05-technology-stack.md (lines 64-67)\n| `tree-sitter` | Concrete Syntax Tree parser | Fast incremental parsing of source code into AST nodes | [chunker.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/chunker.py) | `tree-sitter-python` | Production Code |\n| `tree-sitter-python` | Python grammar bindings | Python language grammar for Tree-sitter parser | [chunker.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/chunker.py) | `tree-sitter` | Production Code |\n| `mcp` | Model Context Protocol SDK | Exposes tools, resources, and RAG search via standard MCP protocol over stdio | [mcp_server.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/mcp_server.py) | `pydantic`, `anyio` | Production Runtime & MCP Tools |\n| `pytest` | Test runner | Automated test execution framework | [tests/](file:///c:/Users/nehad/Project/RepoPilot/backend/tests/) | `pytest-asyncio` | Testing Tooling |",
+        "File: backend/tests/test_chunker.py (lines 68-84)\ndef test_chunk_file_ast_separates_functions_and_classes():\n    \"\"\"AST-aware chunker should separate discrete functions into distinct chunks.\"\"\"\n    code = (\n        \"import math\\n\\n\"\n        \"def compute_area(radius: float) -> float:\\n\"\n        \"    \\\"\\\"\\\"Calculate circle area.\\\"\\\"\\\"\\n\"\n        \"    return math.pi * radius ** 2\\n\\n\"\n        \"def compute_perimeter(radius: float) -> float:\\n\"\n        \"    \\\"\\\"\\\"Calculate circle perimeter.\\\"\\\"\\\"\\n\"\n        \"    return 2 * math.pi * radius\\n\"\n    )\n    chunks = chunk_file(\"geometry.py\", code, chunk_size=50, strategy=\"ast\")\n    # Preamble (import math), compute_area, and compute_perimeter\n    assert len(chunks) >= 2\n    func_names = [c.content for c in chunks]\n    assert any(\"compute_area\" in fn for fn in func_names)\n    assert any(\"compute_perimeter\" in fn for fn in func_names)"
+      ],
+      "context_relevancy_score": 0.4167,
+      "faithfulness_score": 1.0,
+      "answer_relevancy_score": 1.0
+    },
+    {
+      "id": "rp-005",
+      "question": "Where is the Server-Sent Events (SSE) streaming chat endpoint implemented?",
+      "answer": "The Server-Sent Events (SSE) streaming chat endpoint is implemented in the `chat.py` file located at `backend/app/routers/chat.py` on line 232.",
+      "retrieval_context": [
+        "File: docs/20-resume-and-interview-preparation.md (lines 170-176)\n### 15. How does the frontend handle Server-Sent Events (SSE) streaming?\n- **Answer**:\n  In `api.js::streamChatMessage`, native `fetch()` calls the streaming endpoint. It obtains a `ReadableStream` reader (`response.body.getReader()`) and a `TextDecoder`. As byte chunks arrive, it decodes them, splits on `\\n\\n`, preserves partial trailing lines in a buffer, and parses JSON lines starting with `data:`. It fires callbacks (`onToken`, `onToolStart`, `onToolEnd`, `onDone`) to update React state in real time.\n- **Source**: [frontend/src/services/api.js:L216-L288](file:///c:/Users/nehad/Project/RepoPilot/frontend/src/services/api.js#L216-L288).\n\n---",
+        "File: docs/02-feature-inventory.md (lines 221-229)\n   - Streaming in [chat.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/routers/chat.py#L195-L292):\n     - `stream_chat()` invokes `graph.astream_events(..., version=\"v2\")`.\n     - Translates events to Server-Sent Events (SSE) format:\n       - `on_chat_model_stream` -> `{\"type\": \"token\", \"delta\": \"...\"}`\n       - `on_tool_start` -> `{\"type\": \"tool_start\", \"tool\": \"...\", \"args\": {...}}`\n       - `on_tool_end` -> `{\"type\": \"tool_end\", \"tool\": \"...\", \"output\": \"...\"}`\n       - Completion -> `{\"type\": \"done\"}`\n4. **Execution Flow**:\n   User message -> `POST /api/chat/:repo_id/sessions/:session_id/stream` -> SSE connection -> `graph.astream_events` -> agent node -> LLM emits tool call -> SSE `tool_start` -> tools node runs `read_source_file` -> SSE `tool_end` -> agent node generates final explanation -> SSE `token` deltas -> SSE `done` -> UI saves message to thread.",
+        "File: docs/01-project-overview.md (lines 73-76)\n   - Durable conversational persistence via `AsyncPostgresSaver` with `MemorySaver` fallback ([checkpoint.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/agent/checkpoint.py)).\n   - Real-time Server-Sent Events (SSE) streaming endpoint `POST /api/chat/{id}/sessions/{session_id}/stream` emitting token deltas, tool starts, tool outputs, and completion events ([chat.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/routers/chat.py)).\n6. **Model Context Protocol (MCP) Server**:\n   - Standalone MCP server exposing RepoPilot's codebase intelligence, tools, and hybrid retrieval to external AI environments like Cursor and Claude Desktop over stdio ([mcp_server.py](file:///c:/Users/nehad/Project/RepoPilot/backend/app/mcp_server.py), [mcp_config_example.json](file:///c:/Users/nehad/Project/RepoPilot/backend/mcp_config_example.json)).",
+        "File: backend/app/routers/chat.py (lines 232-253)\n@router.post(\n    \"/{repository_id}/sessions/{session_id}/stream\",\n    summary=\"Stream conversation events token-by-token (SSE)\",\n)\nasync def stream_chat(\n    repository_id: int,\n    session_id: str,\n    payload: ChatStreamRequest,\n    db: Session = Depends(get_db),\n) -> StreamingResponse:\n    \"\"\"Stream real-time agent generation and tool execution events using Server-Sent Events (SSE).\"\"\"\n    repo = get_repository_or_404(db, repository_id)\n    require_indexed(repo)\n    chat_session = _get_session_or_404(db, session_id)\n\n    # Parse repo owner and name for state context\n    owner, repo_name = parse_github_url(repo.url)\n\n    # Auto-update session title on first turn if it still has default title\n    if chat_session.title == \"New Conversation\":\n        preview = payload.message.strip()\n        chat_session.title = preview[:40] + (\"\u2026\" if len(preview) > 40 else \"\")",
+        "File: frontend/src/services/api.ts (lines 1-34)\n/**\n * API Service for RepoPilot Frontend.\n *\n * Centralizes all HTTP network requests made to the FastAPI backend.\n * Provides typed wrappers, robust error handling, timeout / AbortSignal support,\n * and Server-Sent Events (SSE) streaming.\n */\n\nimport type {\n  AskResponse,\n  ChatHistoryResponse,\n  ChatSession,\n  IndexResponse,\n  Repository,\n  RepositoryStatus,\n  SearchResponse,\n  StreamHandlers,\n} from \"../types\";\n\nexport const API_BASE_URL =\n  (import.meta.env.VITE_API_URL as string | undefined) || \"http://127.0.0.1:8000/api\";\n\nexport interface ApiFetchOptions extends RequestInit {\n  timeoutMs?: number;\n}\n\n/**\n * Universal wrapper around fetch() with typed responses, custom timeouts, and error parsing.\n */\nexport async function apiFetch<T>(\n  endpoint: string,\n  options: ApiFetchOptions = {}\n): Promise<T> {\n  const { timeoutMs = 30000, headers, ...restOptions } = options;"
+      ],
+      "context_relevancy_score": 0.4545,
+      "faithfulness_score": 1.0,
+      "answer_relevancy_score": 1.0
+    }
+  ]
+}

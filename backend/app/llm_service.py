@@ -14,6 +14,7 @@ import os
 import httpx
 
 from app.search import SearchResult
+from app.llm_provider import acomplete, ProviderError
 
 logger = logging.getLogger(__name__)
 
@@ -154,14 +155,25 @@ async def _try_gemini(prompt: str) -> tuple[str, str]:
 async def ask_with_llm(
     question: str,
     snippets: list[SearchResult],
+    allow_fallback: bool = False,
+    provider: str | None = None,
 ) -> tuple[str, str]:
-    """Generate a grounded answer using either local Ollama or Google Gemini."""
+    """Generate a grounded answer using the configured provider chain and fallback rules."""
     prompt = _build_prompt(question, snippets)
 
-    # 1. Try local Ollama first (no quota limits, 100% private and offline)
-    ollama_result = await _try_ollama(prompt)
-    if ollama_result is not None:
-        return ollama_result
-
-    # 2. Fall back to cloud Gemini API
-    return await _try_gemini(prompt)
+    try:
+        res = await acomplete(
+            prompt=prompt,
+            role="generator",
+            provider=provider,
+            allow_fallback=allow_fallback,
+            temperature=0.2,
+        )
+        return res.text, f"{res.provider}/{res.model}"
+    except Exception as exc:
+        logger.warning("Provider generation failed (%s), attempting legacy local Ollama check...", exc)
+        # Fall back to direct local Ollama if available
+        ollama_result = await _try_ollama(prompt)
+        if ollama_result is not None:
+            return ollama_result
+        raise RuntimeError(f"All generator providers failed: {exc}")
