@@ -69,3 +69,20 @@ pytest evals/tests
 # Run entire repository test suite (backend + evals)
 pytest backend evals/tests
 ```
+
+### 5. Application-Level Evaluation (Level 3)
+
+On Windows, the FastAPI backend uses `psycopg` async connections for LangGraph checkpointing, which requires `SelectorEventLoop` instead of the default `ProactorEventLoop`. Start the backend with:
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -c "import asyncio, uvicorn; asyncio.run(uvicorn.Server(uvicorn.Config('app.main:app', host='127.0.0.1', port=8000)).serve(), loop_factory=asyncio.SelectorEventLoop)"
+```
+
+Then run generation (decoupled from judging):
+
+```powershell
+backend\.venv\Scripts\python.exe evals/scripts/run_application_generate.py --dry-run
+backend\.venv\Scripts\python.exe evals/scripts/run_application_generate.py --limit 3
+backend\.venv\Scripts\python.exe evals/scripts/run_application_generate.py
+```

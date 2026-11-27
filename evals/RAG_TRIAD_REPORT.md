@@ -30,6 +30,7 @@
 - **Baseline generator not logged**: Run `130722` did not record `generator_provider` or `generator_model`.
 - **No noise estimate**: Stochastic judge variance ($\sigma$) could not be completed due to quota exhaustion.
 - **Unverified faithfulness flags**: `rp-009` and `rp-024` are judge-flagged only, pending human review.
+- **Judge sensitivity**: Faithfulness judge may miss small errors (e.g., `rp-002` line attribution), so `2/26` is a lower bound.
 
 ### Collapsed Track Statuses
 - **Ollama-Qwen judge**: not completed (~3 min/question on CPU; single completed row not comparable to Gemini).
@@ -55,7 +56,7 @@
 | `tau = 2.0` (`keep >= 1`) | 3.12 | 0.8462 | 0.4679 |
 | `tau = 3.0` (`keep >= 1`) | 2.38 | 0.7692 | 0.3974 |
 
-- **Decision**: **Keep `k=5`** (no score cutoff, `pool=15`). All tested score cutoffs (`tau=1.0/2.0/3.0`) and `k=3` reduce Binary Hit@k below `1.0000`.
+- **Decision**: Retrieval recall favors `k=5`; `k=4` not yet tested on the triad.
 
 ---
 
@@ -160,5 +161,5 @@ These commands are executed in the `backend/app/main.py` file, lines 67-71, as s
 
 ## 6. Next Steps
 1. Run `k=4` when quota allows with the shipped generator.
-2. Study docs-outranking-code misses (`rp-008`, `rp-017`, `rp-026`, `rp-027`).
-3. Add a generator instruction for premise contradictions (e.g., `rp-009`, `rp-024`).
+2. Study docs-outranking-code misses (`rp-008`, `rp-014`, `rp-017`, `rp-026`, `rp-027`); note that Hit@k counts `docs` files, and code files are missing in 5/8 recall failures (`rp-008`, `014`, `017`, `026`, `027`).
+3. Fix `rp-009`-style config misreads; verify the `rp-024` golden answer against the actual migration.

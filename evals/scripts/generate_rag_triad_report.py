@@ -230,6 +230,7 @@ def render_report(b: dict[str, Any]) -> str:
     lines.append("- **Baseline generator not logged**: Run `130722` did not record `generator_provider` or `generator_model`.")
     lines.append("- **No noise estimate**: Stochastic judge variance ($\sigma$) could not be completed due to quota exhaustion.")
     lines.append("- **Unverified faithfulness flags**: `rp-009` and `rp-024` are judge-flagged only, pending human review.")
+    lines.append("- **Judge sensitivity**: Faithfulness judge may miss small errors (e.g., `rp-002` line attribution), so `2/26` is a lower bound.")
     lines.append("")
     lines.append("### Collapsed Track Statuses")
     lines.append("- **Ollama-Qwen judge**: not completed (~3 min/question on CPU; single completed row not comparable to Gemini).")
@@ -261,7 +262,7 @@ def render_report(b: dict[str, Any]) -> str:
         row = ur[key]
         lines.append(f"| {label} | {row['mean_chunks']:.2f} | {row['binary_hit']:.4f} | {row['multi_target_recall']:.4f} |")
     lines.append("")
-    lines.append("- **Decision**: **Keep `k=5`** (no score cutoff, `pool=15`). All tested score cutoffs (`tau=1.0/2.0/3.0`) and `k=3` reduce Binary Hit@k below `1.0000`.")
+    lines.append("- **Decision**: Retrieval recall favors `k=5`; `k=4` not yet tested on the triad.")
     lines.append("")
     lines.append("---")
     lines.append("")
@@ -319,8 +320,8 @@ def render_report(b: dict[str, Any]) -> str:
     # 6. Next Steps
     lines.append("## 6. Next Steps")
     lines.append("1. Run `k=4` when quota allows with the shipped generator.")
-    lines.append("2. Study docs-outranking-code misses (`rp-008`, `rp-017`, `rp-026`, `rp-027`).")
-    lines.append("3. Add a generator instruction for premise contradictions (e.g., `rp-009`, `rp-024`).")
+    lines.append("2. Study docs-outranking-code misses (`rp-008`, `rp-014`, `rp-017`, `rp-026`, `rp-027`); note that Hit@k counts `docs` files, and code files are missing in 5/8 recall failures (`rp-008`, `014`, `017`, `026`, `027`).")
+    lines.append("3. Fix `rp-009`-style config misreads; verify the `rp-024` golden answer against the actual migration.")
     lines.append("")
 
     return "\n".join(lines)

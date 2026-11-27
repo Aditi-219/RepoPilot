@@ -38,3 +38,9 @@ Thumbs.db
 .agents/
 docs/
 AGENTS.md
+
+# Application & safety eval caches (raw responses)
+evals/runs/application_*.jsonl
+evals/runs/safety_*.jsonl
+evals/runs/safety_report_*.json
+evals/runs/application_judge_cache.json

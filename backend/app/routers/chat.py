@@ -283,6 +283,9 @@ async def stream_chat(
 
     async def event_generator() -> AsyncIterator[str]:
         """Generate formatted SSE event chunks."""
+        total_input_tokens = 0
+        total_output_tokens = 0
+        saw_usage = False
         try:
             async for event in graph.astream_events(initial_input, config=config, version="v2"):
                 event_type = event.get("event")
@@ -311,6 +314,19 @@ async def stream_chat(
                     output_str = str(raw_output)[:400]
                     data = json.dumps({"type": "tool_end", "tool": tool_name, "output": output_str})
                     yield f"data: {data}\n\n"
+
+                # 4. Model call completed — accumulate token usage across the turn
+                elif event_type == "on_chat_model_end":
+                    output = event.get("data", {}).get("output")
+                    usage = getattr(output, "usage_metadata", None)
+                    if isinstance(usage, dict):
+                        total_input_tokens += int(usage.get("input_tokens") or 0)
+                        total_output_tokens += int(usage.get("output_tokens") or 0)
+                        saw_usage = True
+
+            if saw_usage:
+                usage_data = json.dumps({"type": "usage", "input_tokens": total_input_tokens, "output_tokens": total_output_tokens})
+                yield f"data: {usage_data}\n\n"
 
             # Terminal completion event
             yield f"data: {json.dumps({'type': 'done'})}\n\n"

@@ -1,0 +1,216 @@
+{
+  "rubric_correctness_sha256": "ee1a102919e957f3ac83f1771aeb3002f8b6f7a68f389d53ebd57f09f99f1daf",
+  "http_requests_a": 24,
+  "http_requests_b": 25,
+  "mean_pass_a": 0.9783,
+  "mean_pass_b": 1.0,
+  "strict_pass_a": "16/23",
+  "strict_pass_b": "17/23",
+  "diffs": [
+    [
+      "rp-030",
+      0.5,
+      1.0
+    ]
+  ],
+  "mad": 0.0217,
+  "avg_std_dev": 0.0154,
+  "noise_threshold_2x_std": 0.0308,
+  "strict_flips": [
+    [
+      "rp-030",
+      false,
+      true,
+      0.5,
+      1.0
+    ]
+  ],
+  "pass_a": {
+    "rp-001": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying the implementation file (backend/app/search.py) and function (_rrf_fusion) without any factual contradictions, wrong file paths, or incorrect constants."
+    },
+    "rp-002": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the implementation, loading, and invocation of the neural cross-encoder model in backend/app/reranker.py and its integration in backend/app/search.py, with no factual contradictions or wrong file paths, symbol names, or values compared to the expected answer."
+    },
+    "rp-004": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the core file (backend/app/chunker.py) and functions (_get_tree_sitter_parser and chunk_file_ast) specified in the expected answer, with no factual contradictions or wrong paths, symbols, or values."
+    },
+    "rp-005": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the implementation location as backend/app/routers/chat.py and names the correct function stream_chat, matching the expected answer without any factual contradictions or wrong file paths."
+    },
+    "rp-006": {
+      "score": 1.0,
+      "reason": "The actual answer accurately describes the repository ingestion workflow, correctly referencing the core files and functions such as index_repository in backend/app/indexer.py, fetch_repo_tree, chunk_file, and embed_chunks. There are no factual contradictions or wrong file paths, symbols, or values present."
+    },
+    "rp-007": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying the use of `embed_query`, `_semantic_search` with pgvector, `_keyword_search` with tsvector/tsquery, and Reciprocal Rank Fusion via `_rrf_fusion` in `backend/app/search.py`. It contains no factual contradictions or wrong file paths, symbols, or values."
+    },
+    "rp-008": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the core mechanism described in the expected output (checking the recursion step against the limit within 2 steps and injecting a directive to summarize without calling more tools in backend/app/agent/graph.py). It includes additional correct details without any factual contradictions or wrong file paths/symbols."
+    },
+    "rp-010": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the core mechanisms for chunking Markdown files versus regular source code files as implemented in backend/app/chunker.py. Every factual claim is consistent with the expected answer, with no explicit factual contradictions, wrong file paths, wrong symbol names, or wrong constants/values present."
+    },
+    "rp-011": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding the embedding generation functions, the model used (sentence-transformers/all-MiniLM-L6-v2), and the database model class (CodeChunk). There are no factual contradictions, wrong file paths, or incorrect symbol names."
+    },
+    "rp-012": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying the components involved in the codebase Q&A retrieval and generation pipeline (backend/app/routers/rag.py, backend/app/search.py, backend/app/reranker.py, and backend/app/llm_service.py). There are no factual contradictions or wrong file paths, symbols, or values; the actual answer simply provides a more detailed breakdown without conflicting with the reference answer."
+    },
+    "rp-013": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies both the agent tool (`read_source_file`) and the GitHub service function (`fetch_file_content`) matching the expected answer without any factual contradictions, wrong file paths, or wrong symbol names."
+    },
+    "rp-014": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding the initialization of the durable conversation checkpointer in backend/app/agent/checkpoint.py, its registration in backend/app/main.py, and its binding in backend/app/routers/chat.py. There are no factual contradictions or wrong file/symbol names, and additional details provided do not conflict with the expected points."
+    },
+    "rp-015": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding unsupported extensions and file size limits, correctly citing backend/app/github_service.py along with SUPPORTED_EXTENSIONS and MAX_FILE_BYTES. It includes valid extra details that do not contradict any part of the expected output, meaning no points are deducted for omissions or additional information."
+    },
+    "rp-016": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer. It correctly identifies the core function 'require_indexed' in 'backend/app/routers/helpers.py' and explains that an HTTP 409 Conflict occurs when the repository status is not 'completed'. There are no factual contradictions, wrong file paths, or incorrect symbol names, earning the maximum alignment score."
+    },
+    "rp-017": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding how agent_node in backend/app/agent/graph.py handles interrupted tool calls by appending placeholder ToolMessage instances. It contains no factual contradictions, wrong file paths, or incorrect symbol names, earning a top score according to the evaluation steps."
+    },
+    "rp-018": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying that the fallback is to token-based sliding-window chunking via _chunk_by_tokens in backend/app/chunker.py when Tree-sitter fails to initialize or parse. There are no factual contradictions, wrong file paths, or wrong symbol names."
+    },
+    "rp-023": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the implementation location (`frontend/src/services/api.ts`) and the correct function (`streamChatMessage`) as requested. All factual claims and implementation details are consistent with the expected answer with no contradictions or incorrect file paths and symbol names."
+    },
+    "rp-024": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the migration file and accurately describes the creation of the pgvector extension and the primary database tables without any factual contradictions, wrong file paths, or incorrect symbols."
+    },
+    "rp-025": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the initialization file and tool registrations in backend/app/mcp_server.py without any factual contradictions, wrong file paths, or wrong symbol names compared to the expected output."
+    },
+    "rp-026": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying the use of `parse_github_url` in `backend/app/github_service.py` to validate URL structure and reject non-GitHub domains. It contains no factual contradictions or wrong file/symbol paths, and additional details are appropriately treated as non-penalized extra context."
+    },
+    "rp-028": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying the functions `get_repository_or_404` and `require_indexed` in `backend/app/routers/helpers.py`, along with their behaviors (raising 404 if not found and 409 Conflict if `repo.status != 'completed'`). There are no factual contradictions, wrong files, or wrong symbol names."
+    },
+    "rp-029": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the module backend/app/models.py and the exact table names repositories and code_chunks without any factual contradictions or wrong values, aligning perfectly with the expected answer."
+    },
+    "rp-030": {
+      "score": 0.5,
+      "reason": "The actual answer correctly identifies the core file and function (`backend/app/reranker.py` and the `rerank` function) as specified in the expected answer. However, it describes deduplication using a tuple key of `(file_path, start_line, end_line)`, whereas the expected answer states it is done by tracking chunk IDs. This constitutes a substituted value for how deduplication is performed. Following the evaluation steps, providing a wrong symbol or value for the asked item warrants a score reduction."
+    }
+  },
+  "pass_b": {
+    "rp-001": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying that Reciprocal Rank Fusion is implemented in the _rrf_fusion function within backend/app/search.py using RRF_K = 60. There are no factual contradictions, wrong file paths, or incorrect symbol names."
+    },
+    "rp-002": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies that the model is loaded and invoked in backend/app/reranker.py and integrated in backend/app/search.py, with no factual contradictions, wrong file paths, wrong symbols, or incorrect constants/values compared to the expected output."
+    },
+    "rp-004": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the file (backend/app/chunker.py) and functions (_get_tree_sitter_parser and chunk_file_ast) specified in the expected answer without any factual contradictions or wrong file/symbol substitutions. All claims are consistent with the reference."
+    },
+    "rp-005": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the implementation location as `backend/app/routers/chat.py` and names the function `stream_chat` (via line numbers and the key details section), matching the expected answer without any factual contradictions or wrong file/symbol substitutions."
+    },
+    "rp-006": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding the repository ingestion flow. It correctly identifies the core files, functions, and database insertion steps without any factual contradictions or wrong symbol/file references. It includes additional helpful details that do not conflict with the expected points."
+    },
+    "rp-007": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying Reciprocal Rank Fusion, pgvector cosine similarity, full-text search, and the backend/app/search.py location without any factual contradictions or wrong file paths."
+    },
+    "rp-008": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the core mechanism described in the expected answer\u2014checking recursion steps within two steps of the limit in backend/app/agent/graph.py to inject a directive and summarize findings. It contains no factual contradictions or wrong file paths, symbols, or values, aligning with the evaluation criteria for a top score despite providing additional details."
+    },
+    "rp-010": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies that Markdown files are chunked using a specialized heading-based strategy via _chunk_markdown in backend/app/chunker.py, which is completely consistent with the expected answer. There are no factual contradictions, wrong file paths, or wrong symbol names present in the actual output, and additional valid technical details do not detract from the core accuracy."
+    },
+    "rp-011": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding the functions, model, and database model class, containing no factual contradictions, wrong file paths, or incorrect symbol names."
+    },
+    "rp-012": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the core files, functions, and workflow mentioned in the expected output (such as backend/app/routers/rag.py, backend/app/search.py, backend/app/reranker.py, and backend/app/llm_service.py). It contains no factual contradictions or wrong file paths, and provides additional valid implementation details without replacing or conflicting with the expected items."
+    },
+    "rp-013": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies both the agent tool (`read_source_file`) and the GitHub service function (`fetch_file_content`) along with their correct file locations, matching the expected answer without any factual contradictions or wrong values."
+    },
+    "rp-014": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding the initialization of durable conversation checkpointing in backend/app/agent/checkpoint.py, its lifespan registration in backend/app/main.py, and its binding in backend/app/routers/chat.py. There are no factual contradictions or wrong file paths, symbols, or values."
+    },
+    "rp-015": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding the file extension filtering (`SUPPORTED_EXTENSIONS`) and size limits (`MAX_FILE_BYTES` / `100 KB`) located in `backend/app/github_service.py`. It provides additional valid details and correct line numbers without introducing any explicit factual contradictions, wrong file paths, or incorrect symbol/value substitutions."
+    },
+    "rp-016": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer. It correctly identifies that the require_indexed helper in backend/app/routers/helpers.py raises an HTTP 409 Conflict when the repository status is not completed, and contains no factual contradictions or wrong file paths."
+    },
+    "rp-017": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer regarding how the agent_node in backend/app/agent/graph.py handles an interrupted turn with unanswered tool calls. It correctly identifies the core mechanism without any factual contradictions, wrong file paths, or incorrect symbol names. Following the evaluation steps, omitting some details is not penalized, and the response contains no errors or contradictions, earning a maximum score of 10."
+    },
+    "rp-018": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying that the fallback is to token-based sliding-window chunking via _chunk_by_tokens in backend/app/chunker.py when Tree-sitter fails to initialize or parse. There are no factual contradictions, wrong file paths, wrong symbol names, or incorrect values, earning the maximum score of 10 according to the evaluation steps."
+    },
+    "rp-023": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the implementation file as 'frontend/src/services/api.ts' and the function as 'streamChatMessage', which is fully consistent with the expected answer. There are no factual contradictions, wrong file paths, or incorrect symbol names."
+    },
+    "rp-024": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the migration file and accurately lists the creation of the pgvector extension and the primary database tables without any factual contradictions, wrong file paths, or incorrect symbols."
+    },
+    "rp-025": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the initialization file as backend/app/mcp_server.py and lists the expected tools without any factual contradictions or wrong file paths, symbol names, or values compared to the expected answer."
+    },
+    "rp-026": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying 'parse_github_url' and 'backend/app/github_service.py' for GitHub repository URL validation. It contains no factual contradictions or wrong file paths, and any additional details provided are non-conflicting extra information."
+    },
+    "rp-028": {
+      "score": 1.0,
+      "reason": "The actual answer is fully consistent with the expected answer, correctly identifying the functions `get_repository_or_404` and `require_indexed` in `backend/app/routers/helpers.py`, along with the correct error handling (404 for missing repositories and 409 Conflict when status is not completed). There are no factual contradictions or wrong file paths."
+    },
+    "rp-029": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the module (`backend/app/models.py`) and table names (`repositories` and `code_chunks`) for both `Repository` and `CodeChunk`, matching the expected answer without any factual contradictions or wrong file paths."
+    },
+    "rp-030": {
+      "score": 1.0,
+      "reason": "The actual answer correctly identifies the core function (`rerank`) and file (`backend/app/reranker.py`) specified in the expected answer. Although the actual answer includes additional implementation details and explains deduplication via chunk coordinates rather than strictly chunk IDs, it contains no explicit factual contradictions, wrong file paths, or wrong symbol names. Following the evaluation steps, omissions and extra details that do not conflict with the expected items are not penalized, resulting in the highest score."
+    }
+  }
+}

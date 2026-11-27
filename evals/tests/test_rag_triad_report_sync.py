@@ -114,7 +114,7 @@ def test_report_status_and_disclaimers():
 
     assert "judge-flagged, pending human review" in md
     assert "Pipeline retrieval (pool 15) and the component retriever baseline (pool 50) are different systems." in md
-    assert "Keep `k=5`" in md
+    assert "Retrieval recall favors `k=5`; `k=4` not yet tested on the triad." in md
     assert "## 2. Limitations & Incomplete Tracks" in md
     assert "## 6. Next Steps" in md
     assert "generations_baseline_k5.json` used `groq/openai/gpt-oss-120b`" in md
